@@ -1,17 +1,21 @@
 {% import 'macros/form.html' as form %}
 
 {{
-form.input('geojson_url', label=_('GeoJSON URL'), value=resource_view['geojson_url'])
+    form.input('geojson_url', label=_('GeoJSON URL'),
+        value=resource_view['geojson_url'], is_required=true)
 }}
 
 {{
-form.input('geojson_key_field', label=_('GeoJSON Key Field'), value=resource_view['geojson_key_field'])
+    form.input('geojson_key_field', label=_('GeoJSON Key Field'),
+        value=resource_view['geojson_key_field'], is_required=true)
 }}
 
 {{
-form.input('resource_key_field', label=_('Key Field'), value=resource_view['resource_key_field'])
+    form.select('resource_key_field', label=_('Key'), options=fields,
+        selected=resource_view['resource_key_field'], is_required=true)
 }}
 
 {{
-form.input('resource_value_field', label=_('Value Field'), value=resource_view['resource_value_field'])
+    form.select('resource_value_field', label=_('Value'), options=fields,
+        selected=resource_view['resource_value_field'], is_required=true)
 }}

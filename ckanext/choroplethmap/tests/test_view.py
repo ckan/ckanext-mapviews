@@ -1,4 +1,5 @@
 import os
+import mock
 import inspect
 import pylons.config as config
 
@@ -87,7 +88,8 @@ class TestChoroplethMap(object):
         iframed = self.plugin.info().get('iframed', True)
         assert not iframed, 'Plugin should not be iframed'
 
-    def test_setup_template_variables_adds_resource(self):
+    @mock.patch('ckan.plugins.toolkit.get_action')
+    def test_setup_template_variables_adds_resource(self, _):
         resource = {
             'id': 'resource_id',
         }
@@ -97,7 +99,8 @@ class TestChoroplethMap(object):
         assert 'resource' in template_variables
         assert template_variables['resource'] == resource
 
-    def test_setup_template_variables_adds_resource_view(self):
+    @mock.patch('ckan.plugins.toolkit.get_action')
+    def test_setup_template_variables_adds_resource_view(self, _):
         resource_view = {
             'id': 'resource_id',
             'other_attribute': 'value'
@@ -109,7 +112,25 @@ class TestChoroplethMap(object):
         assert 'resource_view' in template_variables
         assert template_variables['resource_view'] == resource_view
 
-    def _setup_template_variables(self, resource={}, resource_view={}):
+    @mock.patch('ckan.plugins.toolkit.get_action')
+    def test_setup_template_variables_adds_fields_without_the_id(self, get_action):
+        fields = [
+          {'id': '_id', 'type': 'int4'},
+          {'id': 'price', 'type': 'numeric'},
+        ]
+        expected_fields = [{'value': 'price'}]
+
+        get_action.return_value.return_value = {
+          'fields': fields,
+          'records': {}
+        }
+        template_variables = self._setup_template_variables()
+
+        returned_fields = template_variables.get('fields')
+        assert returned_fields is not None
+        assert returned_fields == expected_fields
+
+    def _setup_template_variables(self, resource={'id': 'id'}, resource_view={}):
         context = {}
         data_dict = {
             'resource': resource,
