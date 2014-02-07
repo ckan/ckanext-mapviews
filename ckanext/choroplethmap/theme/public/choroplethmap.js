@@ -38,18 +38,17 @@ ckan.module("choroplethmap", function (jQuery) {
   }
 
   function _createScale(geojson) {
-    var colors = ['red', 'green', 'blue', 'black', 'purple'],
+    var colors = ['#F7FBFF', '#DEEBF7', '#C6DBEF', '#9ECAE1', '#6BAED6',
+                  '#4292C6', '#2171B5', '#08519C', '#08306B'],
         values = jQuery.map(geojson.features, function (f) {
         return f.properties.OBJECTID;
       }).sort(),
         min = values[0],
         max = values[values.length - 1];
 
-    window.scale =  d3.scale.quantize()
+    return d3.scale.quantize()
              .domain([min, max])
              .range(colors);
-
-    return scale;
   }
 
   function _addLegend(map, scale) {
