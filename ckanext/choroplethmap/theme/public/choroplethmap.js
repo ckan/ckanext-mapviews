@@ -65,7 +65,7 @@ ckan.module("choroplethmap", function (jQuery) {
           grades = jQuery.map(range, function (_, i) { return (min + step * i).toFixed(1); }),
           labels = [];
 
-      for (var i = 0; i < grades.length; i++) {
+      for (var i = 0, len = grades.length; i < len; i++) {
           div.innerHTML +=
               '<i style="background:' + scale(grades[i]) + '"></i> ' +
               grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
