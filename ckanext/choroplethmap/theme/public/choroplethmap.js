@@ -1,4 +1,4 @@
-ckan.module("choroplethmap", function (jQuery) {
+ckan.module("choroplethmap", function ($) {
   "use strict";
 
   function initialize() {
@@ -7,7 +7,7 @@ ckan.module("choroplethmap", function (jQuery) {
         geojsonProperty = this.options.geojsonProperty,
         map = L.map(id);
 
-    jQuery.getJSON(geojsonUrl, function (geojson) {
+    $.getJSON(geojsonUrl, function (geojson) {
       var geojsonLayer;
       _addBaseLayer(map);
       geojsonLayer = _addGeoJSONLayer(map, geojson, geojsonProperty);
@@ -46,7 +46,7 @@ ckan.module("choroplethmap", function (jQuery) {
   function _createScale(geojson, geojsonProperty) {
     var colors = ['#F7FBFF', '#DEEBF7', '#C6DBEF', '#9ECAE1', '#6BAED6',
                   '#4292C6', '#2171B5', '#08519C', '#08306B'],
-        values = jQuery.map(geojson.features, function (f) {
+        values = $.map(geojson.features, function (f) {
           return f.properties[geojsonProperty];
         }).sort(function (a, b) { return a - b; }),
         min = values[0],
@@ -67,7 +67,7 @@ ckan.module("choroplethmap", function (jQuery) {
           min = domain[0],
           max = domain[domain.length - 1],
           step = (max - min)/range.length,
-          grades = jQuery.map(range, function (_, i) { return (min + step * i); }),
+          grades = $.map(range, function (_, i) { return (min + step * i); }),
           labels = [];
 
       for (var i = 0, len = grades.length; i < len; i++) {
