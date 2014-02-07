@@ -34,10 +34,12 @@ class ChoroplethMap(p.SingletonPlugin):
         resource = data_dict['resource']
         resource_view = data_dict['resource_view']
         fields = _get_fields_without_id(resource)
+        numeric_fields = _get_numeric_fields_without_id(resource)
 
         return {'resource': resource,
                 'resource_view': resource_view,
-                'fields': fields}
+                'fields': fields,
+                'numeric_fields': numeric_fields}
 
     def view_template(self, context, data_dict):
         return 'choroplethmap_view.html'
@@ -49,6 +51,12 @@ class ChoroplethMap(p.SingletonPlugin):
 def _get_fields_without_id(resource):
     fields = _get_fields(resource)
     return [{'value': v['id']} for v in fields if v['id'] != '_id']
+
+
+def _get_numeric_fields_without_id(resource):
+    fields = _get_fields(resource)
+    numeric_fields = [v for v in fields if v['type'] == 'numeric']
+    return [{'value': v['id']} for v in numeric_fields if v['id'] != '_id']
 
 
 def _get_fields(resource):
