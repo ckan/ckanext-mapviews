@@ -1,5 +1,7 @@
 .choroplethmap {
   height: 500px;
+  background-color: transparent !important;
+  cursor: default;
 }
 
 .choroplethmap .legend {

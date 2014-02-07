@@ -7,7 +7,7 @@ ckan.module("choroplethmap", function ($) {
         geojsonKeyField = this.options.geojsonKeyField,
         resourceKeyField = this.options.resourceKeyField,
         resourceValueField = this.options.resourceValueField,
-        map = L.map(elementId),
+        map = L.map(elementId, { zoomControl: false }),
         resource = {
           id: this.options.resourceId,
           endpoint: this.options.endpoint || window.location.origin + '/api'
@@ -21,9 +21,9 @@ ckan.module("choroplethmap", function ($) {
           keyValues = _mapResourceKeyFieldToValues(resourceKeyField,
                                                    resourceValueField,
                                                    query.hits);
-      _addBaseLayer(map);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, keyValues);
       map.fitBounds(geojsonLayer.getBounds());
+      _disableZoomAndPan(map);
     });
   }
 
@@ -37,14 +37,6 @@ ckan.module("choroplethmap", function ($) {
     return mapping;
   }
 
-  function _addBaseLayer(map) {
-    return L.tileLayer('http://{s}.tile.cloudmade.com/{key}/997/256/{z}/{x}/{y}.png', {
-      key: 'd4fc77ea4a63471cab2423e66626cbb6',
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-      maxZoom: 18
-    }).addTo(map);
-  }
-
   function _addGeoJSONLayer(map, geojson, geojsonKeyField, keyValues) {
       var scale = _createScale(geojson, keyValues);
 
@@ -55,12 +47,23 @@ ckan.module("choroplethmap", function ($) {
       }).addTo(map);
   }
 
+  function _disableZoomAndPan(map) {
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+    if (map.tap) {
+      map.tap.disable();
+    }
+  }
+
   function _geoJsonStyle(scale, geojsonKeyField, keyValues) {
     return function (feature) {
       return {
         fillColor: scale(keyValues[feature.properties[geojsonKeyField]]),
-        fillOpacity: 0.7,
-        weight: 2
+        fillOpacity: 1,
+        weight: 2,
+        color: "#031127"
       };
     };
   }
