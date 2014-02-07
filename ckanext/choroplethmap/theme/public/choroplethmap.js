@@ -95,14 +95,18 @@ ckan.module("choroplethmap", function ($) {
       for (var i = 0, len = grades.length; i < len; i++) {
           div.innerHTML +=
               '<i style="background:' + scale(grades[i]) + '"></i> ' +
-              grades[i].toFixed(2) +
-                (grades[i + 1] ? '&ndash;' + grades[i + 1].toFixed(2) + '<br>' : '+');
+              _formatNumber(grades[i]) +
+                (grades[i + 1] ? '&ndash;' + _formatNumber(grades[i + 1]) + '<br>' : '+');
       }
 
       return div;
     }
 
     legend.addTo(map);
+  }
+
+  function _formatNumber(num) {
+    return (num % 1 ? num.toFixed(2) : num);
   }
 
   return {
