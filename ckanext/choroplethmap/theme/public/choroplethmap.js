@@ -2,10 +2,10 @@ ckan.module("choroplethmap", function ($) {
   "use strict";
 
   function initialize() {
-    var id = this.el.attr('id'),
+    var elementId = this.el.context.id,
         geojsonUrl = this.options.geojsonUrl,
         geojsonProperty = this.options.geojsonProperty,
-        map = L.map(id);
+        map = L.map(elementId);
 
     $.getJSON(geojsonUrl, function (geojson) {
       var geojsonLayer;
