@@ -4,10 +4,11 @@ ckan.module("choroplethmap", function (jQuery) {
   function initialize() {
     var id = this.el.attr('id'),
         geojsonUrl = this.options.geojsonUrl,
+        geojsonProperty = this.options.geojsonProperty,
         map = L.map(id).setView([30.4, 69.3], 4);
 
     _addBaseLayer(map);
-    _addGeoJSONLayer(map, geojsonUrl);
+    _addGeoJSONLayer(map, geojsonUrl, geojsonProperty);
   }
 
   function _addBaseLayer(map) {
@@ -18,31 +19,31 @@ ckan.module("choroplethmap", function (jQuery) {
     }).addTo(map);
   }
 
-  function _addGeoJSONLayer(map, geojsonUrl) {
+  function _addGeoJSONLayer(map, geojsonUrl, geojsonProperty) {
     jQuery.getJSON(geojsonUrl, function (geojson) {
-      var scale = _createScale(geojson);
+      var scale = _createScale(geojson, geojsonProperty);
 
-      L.geoJson(geojson, { style: _geoJsonStyle(scale) }).addTo(map);
+      L.geoJson(geojson, { style: _geoJsonStyle(scale, geojsonProperty) }).addTo(map);
       _addLegend(map, scale);
     });
   }
 
-  function _geoJsonStyle(scale) {
+  function _geoJsonStyle(scale, geojsonProperty) {
     return function (feature) {
       return {
-        fillColor: scale(feature.properties.OBJECTID),
+        fillColor: scale(feature.properties[geojsonProperty]),
         fillOpacity: 0.7,
         weight: 2
       };
     };
   }
 
-  function _createScale(geojson) {
+  function _createScale(geojson, geojsonProperty) {
     var colors = ['#F7FBFF', '#DEEBF7', '#C6DBEF', '#9ECAE1', '#6BAED6',
                   '#4292C6', '#2171B5', '#08519C', '#08306B'],
         values = jQuery.map(geojson.features, function (f) {
-        return f.properties.OBJECTID;
-      }).sort(),
+          return f.properties[geojsonProperty];
+        }).sort(function (a, b) { return a - b; }),
         min = values[0],
         max = values[values.length - 1];
 
@@ -61,13 +62,13 @@ ckan.module("choroplethmap", function (jQuery) {
           min = domain[0],
           max = domain[domain.length - 1],
           step = (max - min)/range.length,
-          grades = jQuery.map(range, function (_, i) { return (min + step * i).toFixed(1); }),
+          grades = jQuery.map(range, function (_, i) { return (min + step * i); }),
           labels = [];
 
       for (var i = 0, len = grades.length; i < len; i++) {
           div.innerHTML +=
               '<i style="background:' + scale(grades[i]) + '"></i> ' +
-              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+              grades[i].toFixed() + (grades[i + 1] ? '&ndash;' + grades[i + 1].toFixed() + '<br>' : '+');
       }
 
       return div;
