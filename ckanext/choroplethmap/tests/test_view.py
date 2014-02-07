@@ -61,6 +61,28 @@ class TestChoroplethMap(object):
         assert not_empty in schema['geojson_key_field'], \
             '"geojson_key_field" should not be empty'
 
+    def test_schema_has_resource_key_field(self):
+        schema = self.plugin.info()['schema']
+        assert schema.get('resource_key_field') is not None, \
+            'Schema should define "resource_key_field"'
+
+    def test_schema_resource_key_field_isnt_empty(self):
+        schema = self.plugin.info()['schema']
+        not_empty = p.toolkit.get_validator('not_empty')
+        assert not_empty in schema['resource_key_field'], \
+            '"resource_key_field" should not be empty'
+
+    def test_schema_has_resource_value_field(self):
+        schema = self.plugin.info()['schema']
+        assert schema.get('resource_value_field') is not None, \
+            'Schema should define "resource_value_field"'
+
+    def test_schema_resource_value_field_isnt_empty(self):
+        schema = self.plugin.info()['schema']
+        not_empty = p.toolkit.get_validator('not_empty')
+        assert not_empty in schema['resource_value_field'], \
+            '"resource_value_field" should not be empty'
+
     def test_plugin_isnt_iframed(self):
         iframed = self.plugin.info().get('iframed', True)
         assert not iframed, 'Plugin should not be iframed'
