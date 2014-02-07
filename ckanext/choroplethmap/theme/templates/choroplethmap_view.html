@@ -3,9 +3,10 @@
 <div
   data-module = "choroplethmap"
   data-module-resource-id = "{{ resource.id }}"
+  data-module-resource-key-field = "id"
+  data-module-resource-value-field = "rate"
   data-module-geojson-url = "{{ resource_view.geojson_url }}"
   data-module-geojson-key-field = "{{ resource_view.geojson_key_field }}"
-  data-module-resource-key-field = "id"
   id = "choroplethmap-{{ resource_view.id }}"
   class = "choroplethmap"
   >

@@ -6,6 +6,7 @@ ckan.module("choroplethmap", function ($) {
         geojsonUrl = this.options.geojsonUrl,
         geojsonKeyField = this.options.geojsonKeyField,
         resourceKeyField = this.options.resourceKeyField,
+        resourceValueField = this.options.resourceValueField,
         map = L.map(elementId),
         resource = {
           id: this.options.resourceId,
@@ -17,18 +18,20 @@ ckan.module("choroplethmap", function ($) {
       recline.Backend.Ckan.query({}, resource)
     ).done(function (geojson, query) {
       var geojsonLayer,
-          keyValues = _mapResourceKeyFieldToValues(resourceKeyField, query.hits);
+          keyValues = _mapResourceKeyFieldToValues(resourceKeyField,
+                                                   resourceValueField,
+                                                   query.hits);
       _addBaseLayer(map);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, keyValues);
       map.fitBounds(geojsonLayer.getBounds());
     });
   }
 
-  function _mapResourceKeyFieldToValues(resourceKeyField, data) {
+  function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, data) {
     var mapping = {};
 
     $.each(data, function (i, d) {
-      mapping[d[resourceKeyField]] = parseFloat(d.rate);
+      mapping[d[resourceKeyField]] = parseFloat(d[resourceValueField]);
     });
 
     return mapping;
