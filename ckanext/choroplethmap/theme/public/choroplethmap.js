@@ -4,7 +4,8 @@ ckan.module("choroplethmap", function ($) {
   function initialize() {
     var elementId = this.el.context.id,
         geojsonUrl = this.options.geojsonUrl,
-        geojsonProperty = this.options.geojsonProperty,
+        geojsonKeyField = this.options.geojsonKeyField,
+        resourceKeyField = this.options.resourceKeyField,
         map = L.map(elementId),
         resource = {
           id: this.options.resourceId,
@@ -16,11 +17,21 @@ ckan.module("choroplethmap", function ($) {
       recline.Backend.Ckan.query({}, resource)
     ).done(function (geojson, query) {
       var geojsonLayer,
-          data = query.hits;
+          keyValues = _mapResourceKeyFieldToValues(resourceKeyField, query.hits);
       _addBaseLayer(map);
-      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonProperty, data);
+      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, keyValues);
       map.fitBounds(geojsonLayer.getBounds());
     });
+  }
+
+  function _mapResourceKeyFieldToValues(resourceKeyField, data) {
+    var mapping = {};
+
+    $.each(data, function (i, d) {
+      mapping[d[resourceKeyField]] = parseFloat(d.rate);
+    });
+
+    return mapping;
   }
 
   function _addBaseLayer(map) {
@@ -31,35 +42,31 @@ ckan.module("choroplethmap", function ($) {
     }).addTo(map);
   }
 
-  function _addGeoJSONLayer(map, geojson, geojsonProperty, data) {
-      var scale = _createScale(geojson, data);
+  function _addGeoJSONLayer(map, geojson, geojsonKeyField, keyValues) {
+      var scale = _createScale(geojson, keyValues);
 
       _addLegend(map, scale);
 
       return L.geoJson(geojson, {
-        style: _geoJsonStyle(scale, geojsonProperty, data)
+        style: _geoJsonStyle(scale, geojsonKeyField, keyValues)
       }).addTo(map);
   }
 
-  function _geoJsonStyle(scale, geojsonProperty, data) {
-    var lookupTable = {};
-    $.each(data, function (i, d) {
-      lookupTable[d.id] = d.rate;
-    });
+  function _geoJsonStyle(scale, geojsonKeyField, keyValues) {
     return function (feature) {
       return {
-        fillColor: scale(lookupTable[feature.properties.OBJECTID]),
+        fillColor: scale(keyValues[feature.properties[geojsonKeyField]]),
         fillOpacity: 0.7,
         weight: 2
       };
     };
   }
 
-  function _createScale(geojson, data) {
+  function _createScale(geojson, keyValues) {
     var colors = ['#F7FBFF', '#DEEBF7', '#C6DBEF', '#9ECAE1', '#6BAED6',
                   '#4292C6', '#2171B5', '#08519C', '#08306B'],
-        values = $.map(data, function (f) {
-          return parseFloat(f.rate);
+        values = $.map(keyValues, function (value, key) {
+          return value;
         }).sort(function (a, b) { return a - b; }),
         min = values[0],
         max = values[values.length - 1];

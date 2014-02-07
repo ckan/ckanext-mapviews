@@ -50,16 +50,16 @@ class TestChoroplethMap(object):
         assert not_empty in schema['geojson_url'], \
             '"geojson_url" should not be empty'
 
-    def test_schema_has_geojson_property(self):
+    def test_schema_has_geojson_key_field(self):
         schema = self.plugin.info()['schema']
-        assert schema.get('geojson_property') is not None, \
-            'Schema should define "geojson_property"'
+        assert schema.get('geojson_key_field') is not None, \
+            'Schema should define "geojson_key_field"'
 
-    def test_schema_geojson_property_isnt_empty(self):
+    def test_schema_geojson_key_field_isnt_empty(self):
         schema = self.plugin.info()['schema']
         not_empty = p.toolkit.get_validator('not_empty')
-        assert not_empty in schema['geojson_property'], \
-            '"geojson_property" should not be empty'
+        assert not_empty in schema['geojson_key_field'], \
+            '"geojson_key_field" should not be empty'
 
     def test_plugin_isnt_iframed(self):
         iframed = self.plugin.info().get('iframed', True)
