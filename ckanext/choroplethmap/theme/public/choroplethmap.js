@@ -20,13 +20,14 @@ ckan.module("choroplethmap", function (jQuery) {
 
   function _addGeoJSONLayer(map, geojsonUrl) {
     jQuery.getJSON(geojsonUrl, function (geojson) {
-      L.geoJson(geojson, { style: _geoJsonStyle(geojson) }).addTo(map);
+      var scale = _createScale(geojson);
+
+      L.geoJson(geojson, { style: _geoJsonStyle(scale) }).addTo(map);
+      _addLegend(map, scale);
     });
   }
 
-  function _geoJsonStyle(geojson) {
-    var scale = _createScale(geojson);
-
+  function _geoJsonStyle(scale) {
     return function (feature) {
       return {
         fillColor: scale(feature.properties.OBJECTID),
@@ -37,16 +38,43 @@ ckan.module("choroplethmap", function (jQuery) {
   }
 
   function _createScale(geojson) {
-    var colors = ['red', 'green', 'blue'],
+    var colors = ['red', 'green', 'blue', 'black', 'purple'],
         values = jQuery.map(geojson.features, function (f) {
         return f.properties.OBJECTID;
       }).sort(),
         min = values[0],
         max = values[values.length - 1];
 
-    return d3.scale.quantize()
+    window.scale =  d3.scale.quantize()
              .domain([min, max])
              .range(colors);
+
+    return scale;
+  }
+
+  function _addLegend(map, scale) {
+    var legend = L.control({ position: 'bottomright' });
+
+    legend.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend'),
+          domain = scale.domain(),
+          range = scale.range(),
+          min = domain[0],
+          max = domain[domain.length - 1],
+          step = (max - min)/range.length,
+          grades = jQuery.map(range, function (_, i) { return (min + step * i).toFixed(1); }),
+          labels = [];
+
+      for (var i = 0; i < grades.length; i++) {
+          div.innerHTML +=
+              '<i style="background:' + scale(grades[i]) + '"></i> ' +
+              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+      }
+
+      return div;
+    }
+
+    legend.addTo(map);
   }
 
   return {
