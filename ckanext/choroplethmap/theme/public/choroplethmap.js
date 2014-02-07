@@ -20,28 +20,33 @@ ckan.module("choroplethmap", function (jQuery) {
 
   function _addGeoJSONLayer(map, geojsonUrl) {
     jQuery.getJSON(geojsonUrl, function (geojson) {
-      L.geoJson(geojson, { style: _geoJsonStyle }).addTo(map);
+      L.geoJson(geojson, { style: _geoJsonStyle(geojson) }).addTo(map);
     });
   }
 
-  function _geoJsonStyle(feature) {
-    var colors = [
-      '#f00000',
-      '#ff0000',
-      '#fff000',
-      '#ffff00',
-      '#fffff0',
-      '#ffffff',
-      '#0f0000',
-      '#00f000',
-      '#000f00'
-    ];
+  function _geoJsonStyle(geojson) {
+    var scale = _createScale(geojson);
 
-    return {
-      fillColor: colors[parseInt(feature.properties.OBJECTID) % colors.length],
-      fillOpacity: 0.7,
-      weight: 2
+    return function (feature) {
+      return {
+        fillColor: scale(feature.properties.OBJECTID),
+        fillOpacity: 0.7,
+        weight: 2
+      };
     };
+  }
+
+  function _createScale(geojson) {
+    var colors = ['red', 'green', 'blue'],
+        values = jQuery.map(geojson.features, function (f) {
+        return f.properties.OBJECTID;
+      }).sort(),
+        min = values[0],
+        max = values[values.length - 1];
+
+    return d3.scale.quantize()
+             .domain([min, max])
+             .range(colors);
   }
 
   return {
