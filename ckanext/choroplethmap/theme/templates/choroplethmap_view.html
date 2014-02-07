@@ -1,12 +1,9 @@
-{% resource 'basiccharts/main' %}
+{% resource 'choroplethmap/main' %}
 
-{{ resource_view }}
 <div
-  data-module = "basiccharts_view"
-  data-module-chart-type = "{{ chart_type }}"
-  data-module-resource-id = "{{ resource.id }}"
-  data-module-resource-view = "{{ h.dump_json(resource_view) }}"
-  id = "basicChart-{{ resource_view.id }}"
-  class = "basicChart"
+  data-module = "choroplethmap"
+  data-module-geojson-url = "{{ resource_view.geojson_url }}"
+  id = "choroplethmap-{{ resource_view.id }}"
+  class = "choroplethmap"
   >
 </div>
