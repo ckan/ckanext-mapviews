@@ -43,7 +43,8 @@ ckan.module("choroplethmap", function ($) {
       _addLegend(map, scale);
 
       return L.geoJson(geojson, {
-        style: _style(scale, geojsonKeyField, keyValues)
+        style: _style(scale, geojsonKeyField, keyValues),
+        onEachFeature: _onEachFeature
       }).addTo(map);
   }
 
@@ -55,17 +56,6 @@ ckan.module("choroplethmap", function ($) {
     if (map.tap) {
       map.tap.disable();
     }
-  }
-
-  function _style(scale, geojsonKeyField, keyValues) {
-    return function (feature) {
-      return {
-        fillColor: scale(keyValues[feature.properties[geojsonKeyField]]),
-        fillOpacity: 1,
-        weight: 2,
-        color: "#031127"
-      };
-    };
   }
 
   function _createScale(geojson, keyValues) {
@@ -108,8 +98,44 @@ ckan.module("choroplethmap", function ($) {
     legend.addTo(map);
   }
 
+  function _style(scale, geojsonKeyField, keyValues) {
+    return function (feature) {
+      return {
+        fillColor: scale(keyValues[feature.properties[geojsonKeyField]]),
+        fillOpacity: 1,
+        weight: 2,
+        color: "#031127"
+      };
+    };
+  }
+
+  function _onEachFeature(feature, layer) {
+    layer.on({
+      mouseover: _highlightFeature,
+      mouseout: _resetHighlight
+    });
+  }
+
   function _formatNumber(num) {
     return (num % 1 ? num.toFixed(2) : num);
+  }
+
+  function _highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+      weight: 5
+    });
+
+    if (!L.Browser.ie && !L.Browser.opera) {
+      layer.bringToFront();
+    }
+  }
+
+  function _resetHighlight(e) {
+    e.target.setStyle({
+      weight: 2
+    });
   }
 
   return {
