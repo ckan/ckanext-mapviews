@@ -3,15 +3,16 @@ ckan.module('choroplethmap', function ($) {
 
   function initialize() {
     var elementId = this.el.context.id,
-        geojsonUrl = this.options.geojsonUrl,
-        geojsonKeyField = this.options.geojsonKeyField,
-        resourceKeyField = this.options.resourceKeyField,
-        resourceValueField = this.options.resourceValueField,
-        resourceLabelField = this.options.resourceLabelField,
+        options = this.options,
+        geojsonUrl = options.geojsonUrl,
+        geojsonKeyField = options.geojsonKeyField,
+        resourceKeyField = options.resourceKeyField,
+        resourceValueField = options.resourceValueField,
+        resourceLabelField = options.resourceLabelField,
         map = L.map(elementId, { zoomControl: false }),
         resource = {
-          id: this.options.resourceId,
-          endpoint: this.options.endpoint || window.location.origin + '/api'
+          id: options.resourceId,
+          endpoint: options.endpoint || window.location.origin + '/api'
         };
 
     $.when(
