@@ -1,5 +1,5 @@
-ckan.module("choroplethmap", function ($) {
-  "use strict";
+ckan.module('choroplethmap', function ($) {
+  'use strict';
 
   function initialize() {
     var elementId = this.el.context.id,
@@ -109,7 +109,7 @@ ckan.module("choroplethmap", function ($) {
         fillColor: scale(featuresValues[feature.properties[geojsonKeyField]].value),
         fillOpacity: 1,
         weight: 2,
-        color: "#031127"
+        color: '#031127'
       };
     };
   }
@@ -117,7 +117,7 @@ ckan.module("choroplethmap", function ($) {
   function _onEachFeature(geojsonKeyField, featuresValues) {
     return function (feature, layer) {
       var elementData = featuresValues[feature.properties[geojsonKeyField]],
-          label = elementData.label + ": " + elementData.value;
+          label = elementData.label + ': ' + elementData.value;
 
       layer.bindLabel(label);
       layer.on({
