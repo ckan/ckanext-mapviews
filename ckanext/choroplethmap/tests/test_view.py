@@ -126,14 +126,14 @@ class TestChoroplethMap(object):
     @mock.patch('ckan.plugins.toolkit.get_action')
     def test_setup_template_variables_adds_fields_without_the_id(self, get_action):
         fields = [
-          {'id': '_id', 'type': 'int4'},
-          {'id': 'price', 'type': 'numeric'},
+            {'id': '_id', 'type': 'int4'},
+            {'id': 'price', 'type': 'numeric'},
         ]
         expected_fields = [{'value': 'price'}]
 
         get_action.return_value.return_value = {
-          'fields': fields,
-          'records': {}
+            'fields': fields,
+            'records': {}
         }
         template_variables = self._setup_template_variables()
 
@@ -144,19 +144,38 @@ class TestChoroplethMap(object):
     @mock.patch('ckan.plugins.toolkit.get_action')
     def test_setup_template_variables_adds_numeric_fields(self, get_action):
         fields = [
-          {'id': '_id', 'type': 'int4'},
-          {'id': 'price', 'type': 'numeric'},
-          {'id': 'name', 'type': 'text'}
+            {'id': '_id', 'type': 'int4'},
+            {'id': 'price', 'type': 'numeric'},
+            {'id': 'name', 'type': 'text'}
         ]
         expected_fields = [{'value': 'price'}]
 
         get_action.return_value.return_value = {
-          'fields': fields,
-          'records': {}
+            'fields': fields,
+            'records': {}
         }
         template_variables = self._setup_template_variables()
 
         returned_fields = template_variables.get('numeric_fields')
+        assert returned_fields is not None
+        assert returned_fields == expected_fields
+
+    @mock.patch('ckan.plugins.toolkit.get_action')
+    def test_setup_template_variables_adds_textual_fields(self, get_action):
+        fields = [
+            {'id': '_id', 'type': 'int4'},
+            {'id': 'price', 'type': 'numeric'},
+            {'id': 'name', 'type': 'text'}
+        ]
+        expected_fields = [{'value': 'name'}]
+
+        get_action.return_value.return_value = {
+            'fields': fields,
+            'records': {}
+        }
+        template_variables = self._setup_template_variables()
+
+        returned_fields = template_variables.get('textual_fields')
         assert returned_fields is not None
         assert returned_fields == expected_fields
 

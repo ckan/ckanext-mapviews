@@ -34,30 +34,22 @@ class ChoroplethMap(p.SingletonPlugin):
     def setup_template_variables(self, context, data_dict):
         resource = data_dict['resource']
         resource_view = data_dict['resource_view']
-        fields = _get_fields_without_id(resource)
-        numeric_fields = _get_numeric_fields_without_id(resource)
+        fields = _get_fields(resource)
+        fields_without_id = _remove_id_and_prepare_to_template(fields)
+        numeric_fields = _filter_numeric_fields_without_id(fields)
+        textual_fields = _filter_textual_fields_without_id(fields)
 
         return {'resource': resource,
                 'resource_view': resource_view,
-                'fields': fields,
-                'numeric_fields': numeric_fields}
+                'fields': fields_without_id,
+                'numeric_fields': numeric_fields,
+                'textual_fields': textual_fields}
 
     def view_template(self, context, data_dict):
         return 'choroplethmap_view.html'
 
     def form_template(self, context, data_dict):
         return 'choroplethmap_form.html'
-
-
-def _get_fields_without_id(resource):
-    fields = _get_fields(resource)
-    return [{'value': v['id']} for v in fields if v['id'] != '_id']
-
-
-def _get_numeric_fields_without_id(resource):
-    fields = _get_fields(resource)
-    numeric_fields = [v for v in fields if v['type'] == 'numeric']
-    return [{'value': v['id']} for v in numeric_fields if v['id'] != '_id']
 
 
 def _get_fields(resource):
@@ -67,3 +59,20 @@ def _get_fields(resource):
     }
     result = p.toolkit.get_action('datastore_search')({}, data)
     return result['fields']
+
+
+def _remove_id_and_prepare_to_template(fields):
+    isnt_id = lambda v: v['id'] != '_id'
+    return [{'value': v['id']} for v in fields if isnt_id(v)]
+
+
+def _filter_numeric_fields_without_id(fields):
+    isnt_id = lambda v: v['id'] != '_id'
+    is_numeric = lambda v: v['type'] == 'numeric'
+    return [{'value': v['id']} for v in fields if isnt_id(v) and is_numeric(v)]
+
+
+def _filter_textual_fields_without_id(fields):
+    isnt_id = lambda v: v['id'] != '_id'
+    is_text = lambda v: v['type'] == 'text'
+    return [{'value': v['id']} for v in fields if isnt_id(v) and is_text(v)]
