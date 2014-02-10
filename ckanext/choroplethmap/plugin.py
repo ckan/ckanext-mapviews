@@ -18,7 +18,8 @@ class ChoroplethMap(p.SingletonPlugin):
             'geojson_url': [not_empty],
             'geojson_key_field': [not_empty],
             'resource_key_field': [not_empty],
-            'resource_value_field': [not_empty]
+            'resource_value_field': [not_empty],
+            'resource_label_field': [not_empty],
         }
 
         return {'name': 'choropleth-map',

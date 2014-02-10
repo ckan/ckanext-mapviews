@@ -19,3 +19,8 @@
     form.select('resource_value_field', label=_('Value'), options=numeric_fields,
         selected=resource_view['resource_value_field'], is_required=true)
 }}
+
+{{
+    form.select('resource_label_field', label=_('Label'), options=fields,
+        selected=resource_view['resource_label_field'], is_required=true)
+}}

@@ -84,6 +84,17 @@ class TestChoroplethMap(object):
         assert not_empty in schema['resource_value_field'], \
             '"resource_value_field" should not be empty'
 
+    def test_schema_has_resource_label_field(self):
+        schema = self.plugin.info()['schema']
+        assert schema.get('resource_label_field') is not None, \
+            'Schema should define "resource_label_field"'
+
+    def test_schema_resource_label_field_isnt_empty(self):
+        schema = self.plugin.info()['schema']
+        not_empty = p.toolkit.get_validator('not_empty')
+        assert not_empty in schema['resource_label_field'], \
+            '"resource_label_field" should not be empty'
+
     def test_plugin_isnt_iframed(self):
         iframed = self.plugin.info().get('iframed', True)
         assert not iframed, 'Plugin should not be iframed'

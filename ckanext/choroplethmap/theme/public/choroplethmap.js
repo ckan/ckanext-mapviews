@@ -7,6 +7,7 @@ ckan.module("choroplethmap", function ($) {
         geojsonKeyField = this.options.geojsonKeyField,
         resourceKeyField = this.options.resourceKeyField,
         resourceValueField = this.options.resourceValueField,
+        resourceLabelField = this.options.resourceLabelField,
         map = L.map(elementId, { zoomControl: false }),
         resource = {
           id: this.options.resourceId,
@@ -20,6 +21,7 @@ ckan.module("choroplethmap", function ($) {
       var geojsonLayer,
           keyValues = _mapResourceKeyFieldToValues(resourceKeyField,
                                                    resourceValueField,
+                                                   resourceLabelField,
                                                    query.hits);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, keyValues);
       map.fitBounds(geojsonLayer.getBounds());
@@ -27,11 +29,14 @@ ckan.module("choroplethmap", function ($) {
     });
   }
 
-  function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, data) {
+  function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, resourceLabelField, data) {
     var mapping = {};
 
     $.each(data, function (i, d) {
-      mapping[d[resourceKeyField]] = parseFloat(d[resourceValueField]);
+      mapping[d[resourceKeyField]] = {
+        label: d[resourceLabelField],
+        value: parseFloat(d[resourceValueField])
+      };
     });
 
     return mapping;
@@ -44,7 +49,7 @@ ckan.module("choroplethmap", function ($) {
 
       return L.geoJson(geojson, {
         style: _style(scale, geojsonKeyField, keyValues),
-        onEachFeature: _onEachFeature
+        onEachFeature: _onEachFeature(geojsonKeyField, keyValues)
       }).addTo(map);
   }
 
@@ -62,7 +67,7 @@ ckan.module("choroplethmap", function ($) {
     var colors = ['#F7FBFF', '#DEEBF7', '#C6DBEF', '#9ECAE1', '#6BAED6',
                   '#4292C6', '#2171B5', '#08519C', '#08306B'],
         values = $.map(keyValues, function (value, key) {
-          return value;
+          return value.value;
         }).sort(function (a, b) { return a - b; }),
         min = values[0],
         max = values[values.length - 1];
@@ -101,7 +106,7 @@ ckan.module("choroplethmap", function ($) {
   function _style(scale, geojsonKeyField, keyValues) {
     return function (feature) {
       return {
-        fillColor: scale(keyValues[feature.properties[geojsonKeyField]]),
+        fillColor: scale(keyValues[feature.properties[geojsonKeyField]].value),
         fillOpacity: 1,
         weight: 2,
         color: "#031127"
@@ -109,11 +114,17 @@ ckan.module("choroplethmap", function ($) {
     };
   }
 
-  function _onEachFeature(feature, layer) {
-    layer.on({
-      mouseover: _highlightFeature,
-      mouseout: _resetHighlight
-    });
+  function _onEachFeature(geojsonKeyField, keyValues) {
+    return function (feature, layer) {
+      var elementData = keyValues[feature.properties[geojsonKeyField]],
+          label = elementData.label + ": " + elementData.value;
+
+      layer.bindLabel(label);
+      layer.on({
+        mouseover: _highlightFeature,
+        mouseout: _resetHighlight
+      });
+    }
   }
 
   function _formatNumber(num) {
