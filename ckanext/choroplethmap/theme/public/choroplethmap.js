@@ -43,7 +43,7 @@ ckan.module("choroplethmap", function ($) {
       _addLegend(map, scale);
 
       return L.geoJson(geojson, {
-        style: _geoJsonStyle(scale, geojsonKeyField, keyValues)
+        style: _style(scale, geojsonKeyField, keyValues)
       }).addTo(map);
   }
 
@@ -57,7 +57,7 @@ ckan.module("choroplethmap", function ($) {
     }
   }
 
-  function _geoJsonStyle(scale, geojsonKeyField, keyValues) {
+  function _style(scale, geojsonKeyField, keyValues) {
     return function (feature) {
       return {
         fillColor: scale(keyValues[feature.properties[geojsonKeyField]]),
