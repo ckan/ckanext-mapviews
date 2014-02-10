@@ -25,6 +25,8 @@ class ChoroplethMap(p.SingletonPlugin):
         return {'name': 'choropleth-map',
                 'title': 'Choropleth Map',
                 'icon': 'map-marker',
+                'sizex': 6,
+                'sizey': 4,
                 'schema': schema,
                 'iframed': False}
 
