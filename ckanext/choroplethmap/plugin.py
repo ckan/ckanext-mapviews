@@ -1,6 +1,23 @@
-import ckan.plugins as p
+import urlparse
 
+import ckan.plugins as p
+import pylons.config as config
+
+Invalid = p.toolkit.Invalid
+_ = p.toolkit._
 not_empty = p.toolkit.get_validator('not_empty')
+
+
+def url_is_relative_or_in_same_domain(url):
+    site_url = urlparse.urlparse(config.get('ckan.site_url', ''))
+    parsed_url = urlparse.urlparse(url)
+
+    is_relative = (parsed_url.netloc == '')
+    is_in_same_domain = (parsed_url.netloc == site_url.netloc)
+
+    if not (is_relative or is_in_same_domain):
+        message = _('Must be a relative URL or in the same domain as CKAN')
+        raise Invalid(message)
 
 
 class ChoroplethMap(p.SingletonPlugin):
@@ -15,7 +32,7 @@ class ChoroplethMap(p.SingletonPlugin):
 
     def info(self):
         schema = {
-            'geojson_url': [not_empty],
+            'geojson_url': [not_empty, url_is_relative_or_in_same_domain],
             'geojson_key_field': [not_empty],
             'resource_key_field': [not_empty],
             'resource_value_field': [not_empty],

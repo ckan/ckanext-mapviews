@@ -1,9 +1,31 @@
 import os
 import mock
 import inspect
+import nose.tools
 import pylons.config as config
 
 import ckan.plugins as p
+import ckanext.choroplethmap.plugin as cm
+
+
+url_is_relative_or_in_same_domain = cm.url_is_relative_or_in_same_domain
+Invalid = p.toolkit.Invalid
+
+
+def test_url_is_relative_or_in_same_domain_accepts_urls_on_same_domain():
+    site_url = config.get('ckan.site_url')
+    url = site_url + "/dataset/something"
+
+    url_is_relative_or_in_same_domain(url)
+
+
+def test_url_is_relative_or_in_same_domain_accepts_relative_urls():
+    url_is_relative_or_in_same_domain("/dataset/something")
+
+
+@nose.tools.raises(Invalid)
+def test_url_is_relative_or_in_same_domain_raises_if_not_on_the_same_domain():
+    url_is_relative_or_in_same_domain("http://some-other-domain.com")
 
 
 class TestChoroplethMap(object):
@@ -50,6 +72,12 @@ class TestChoroplethMap(object):
         not_empty = p.toolkit.get_validator('not_empty')
         assert not_empty in schema['geojson_url'], \
             '"geojson_url" should not be empty'
+
+    def test_schema_geojson_url_is_relative_or_in_same_domain(self):
+        schema = self.plugin.info()['schema']
+
+        assert url_is_relative_or_in_same_domain in schema['geojson_url'], \
+            '"geojson_url" should be relative or in same domain'
 
     def test_schema_has_geojson_key_field(self):
         schema = self.plugin.info()['schema']
