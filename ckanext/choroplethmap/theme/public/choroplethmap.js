@@ -25,6 +25,7 @@ ckan.module('choroplethmap', function ($) {
                                                         resourceValueField,
                                                         resourceLabelField,
                                                         query.hits);
+      _addBaseLayer(map);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, featuresValues);
       bounds = geojsonLayer.getBounds();
 
@@ -44,6 +45,18 @@ ckan.module('choroplethmap', function ($) {
     });
 
     return mapping;
+  }
+
+  function _addBaseLayer(map) {
+    var attribution = 'Map data &copy; OpenStreetMap contributors, Tiles ' +
+                      'Courtesy of <a href="http://www.mapquest.com/"' +
+                      'target="_blank">MapQuest</a> <img' +
+                      'src="//developer.mapquest.com/content/osm/mq_logo.png">';
+
+    return L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+      subdomains: '1234',
+      attribution: attribution
+    }).addTo(map);
   }
 
   function _addGeoJSONLayer(map, geojson, geojsonKeyField, featuresValues) {
