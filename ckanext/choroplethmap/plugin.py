@@ -19,6 +19,8 @@ def url_is_relative_or_in_same_domain(url):
         message = _('Must be a relative URL or in the same domain as CKAN')
         raise Invalid(message)
 
+    return url
+
 
 class ChoroplethMap(p.SingletonPlugin):
     '''Creates a choropleth map view'''

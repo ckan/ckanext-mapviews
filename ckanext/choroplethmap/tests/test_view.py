@@ -16,11 +16,12 @@ def test_url_is_relative_or_in_same_domain_accepts_urls_on_same_domain():
     site_url = config.get('ckan.site_url')
     url = site_url + "/dataset/something"
 
-    url_is_relative_or_in_same_domain(url)
+    assert url_is_relative_or_in_same_domain(url) == url
 
 
 def test_url_is_relative_or_in_same_domain_accepts_relative_urls():
-    url_is_relative_or_in_same_domain("/dataset/something")
+    url = "/dataset/something"
+    assert url_is_relative_or_in_same_domain(url) == url
 
 
 @nose.tools.raises(Invalid)
