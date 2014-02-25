@@ -8,15 +8,22 @@
   height: 100%;
 }
 
-.choroplethmap .legend {
+.choroplethmap .info {
   line-height: 18px;
   background-color: white;
   padding: 0.5em;
 }
 
-.choroplethmap .legend i {
-  width: 18px;
-  height: 18px;
+.choroplethmap .legend {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.choroplethmap .legend span {
+  width: 16px;
+  height: 16px;
   float: left;
   margin-right: 8px;
+  border: 1px solid #969696;
 }

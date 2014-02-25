@@ -1,6 +1,11 @@
 ckan.module('choroplethmap', function ($) {
   'use strict';
 
+  var noDataColor = '#F7FBFF',
+      borderColor = '#031127',
+      colors = ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6',
+                '#2171B5', '#08519C', '#08306B'];
+
   function initialize() {
     var elementId = this.el.context.id,
         options = this.options,
@@ -72,9 +77,7 @@ ckan.module('choroplethmap', function ($) {
   }
 
   function _createScale(geojson, featuresValues) {
-    var colors = ['#F7FBFF', '#DEEBF7', '#C6DBEF', '#9ECAE1', '#6BAED6',
-                  '#4292C6', '#2171B5', '#08519C', '#08306B'],
-        values = $.map(featuresValues, function (feature, key) {
+    var values = $.map(featuresValues, function (feature, key) {
           return feature.value;
         }).sort(function (a, b) { return a - b; }),
         min = values[0],
@@ -89,7 +92,8 @@ ckan.module('choroplethmap', function ($) {
     var legend = L.control({ position: 'bottomright' });
 
     legend.onAdd = function (map) {
-      var div = L.DomUtil.create('div', 'info legend'),
+      var div = L.DomUtil.create('div', 'info'),
+          ul = L.DomUtil.create('ul', 'legend'),
           domain = scale.domain(),
           range = scale.range(),
           min = domain[0],
@@ -98,12 +102,17 @@ ckan.module('choroplethmap', function ($) {
           grades = $.map(range, function (_, i) { return (min + step * i); }),
           labels = [];
 
+      div.appendChild(ul);
       for (var i = 0, len = grades.length; i < len; i++) {
-          div.innerHTML +=
-              '<i style="background:' + scale(grades[i]) + '; opacity: ' + opacity + '"></i> ' +
+          ul.innerHTML +=
+              '<li><span style="background:' + scale(grades[i]) + '; opacity: ' + opacity + '"></span> ' +
               _formatNumber(grades[i]) +
-                (grades[i + 1] ? '&ndash;' + _formatNumber(grades[i + 1]) + '<br>' : '+');
+                (grades[i + 1] ? '&ndash;' + _formatNumber(grades[i + 1]) + '</li>' : '+</li></ul>');
       }
+
+      ul.innerHTML +=
+          '<li><span style="background:' + noDataColor + '; opacity: ' + opacity + '"></span> ' +
+          'No Data</li>';
 
       return div;
     }
@@ -113,25 +122,31 @@ ckan.module('choroplethmap', function ($) {
 
   function _style(scale, opacity, geojsonKeyField, featuresValues) {
     return function (feature) {
+      var value = featuresValues[feature.properties[geojsonKeyField]],
+          color = (value) ? scale(value.value) : noDataColor;
+
       return {
-        fillColor: scale(featuresValues[feature.properties[geojsonKeyField]].value),
+        fillColor: color,
         fillOpacity: opacity,
         weight: 2,
-        color: '#031127'
+        color: borderColor
       };
     };
   }
 
   function _onEachFeature(geojsonKeyField, featuresValues) {
     return function (feature, layer) {
-      var elementData = featuresValues[feature.properties[geojsonKeyField]],
-          label = elementData.label + ': ' + elementData.value;
+      var elementData = featuresValues[feature.properties[geojsonKeyField]];
 
-      layer.bindLabel(label);
-      layer.on({
-        mouseover: _highlightFeature,
-        mouseout: _resetHighlight
-      });
+      if (elementData && elementData.label && elementData.value) {
+        var label = elementData.label + ': ' + elementData.value;
+
+        layer.bindLabel(label);
+        layer.on({
+          mouseover: _highlightFeature,
+          mouseout: _resetHighlight
+        });
+      }
     }
   }
 
