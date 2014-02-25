@@ -9,7 +9,7 @@ ckan.module('choroplethmap', function ($) {
         resourceKeyField = options.resourceKeyField,
         resourceValueField = options.resourceValueField,
         resourceLabelField = options.resourceLabelField,
-        map = L.map(elementId, { zoomControl: false }),
+        map = L.map(elementId),
         resource = {
           id: options.resourceId,
           endpoint: options.endpoint || window.location.origin + '/api'
@@ -20,13 +20,16 @@ ckan.module('choroplethmap', function ($) {
       recline.Backend.Ckan.query({}, resource)
     ).done(function (geojson, query) {
       var geojsonLayer,
+          bounds,
           featuresValues = _mapResourceKeyFieldToValues(resourceKeyField,
                                                         resourceValueField,
                                                         resourceLabelField,
                                                         query.hits);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, featuresValues);
-      map.fitBounds(geojsonLayer.getBounds());
-      _disableZoomAndPan(map);
+      bounds = geojsonLayer.getBounds();
+
+      map.fitBounds(bounds);
+      map.setMaxBounds(bounds);
     });
   }
 
@@ -52,16 +55,6 @@ ckan.module('choroplethmap', function ($) {
         style: _style(scale, geojsonKeyField, featuresValues),
         onEachFeature: _onEachFeature(geojsonKeyField, featuresValues)
       }).addTo(map);
-  }
-
-  function _disableZoomAndPan(map) {
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    if (map.tap) {
-      map.tap.disable();
-    }
   }
 
   function _createScale(geojson, featuresValues) {
