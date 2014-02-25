@@ -1,4 +1,4 @@
-ckan.module('choroplethmap', function ($) {
+ckan.module('choroplethmap', function ($, _) {
   'use strict';
 
   var noDataColor = '#F7FBFF',
@@ -14,6 +14,7 @@ ckan.module('choroplethmap', function ($) {
         resourceKeyField = options.resourceKeyField,
         resourceValueField = options.resourceValueField,
         resourceLabelField = options.resourceLabelField,
+        noDataLabel = this.i18n('noData'),
         map = L.map(elementId),
         resource = {
           id: options.resourceId,
@@ -32,7 +33,7 @@ ckan.module('choroplethmap', function ($) {
                                                         resourceLabelField,
                                                         query.hits);
       _addBaseLayer(map);
-      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, featuresValues);
+      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, noDataLabel, featuresValues);
       bounds = geojsonLayer.getBounds();
 
       map.fitBounds(bounds);
@@ -65,10 +66,10 @@ ckan.module('choroplethmap', function ($) {
     }).addTo(map);
   }
 
-  function _addGeoJSONLayer(map, geojson, geojsonKeyField, opacity, featuresValues) {
+  function _addGeoJSONLayer(map, geojson, geojsonKeyField, opacity, noDataLabel, featuresValues) {
       var scale = _createScale(geojson, featuresValues);
 
-      _addLegend(map, scale, opacity);
+      _addLegend(map, scale, opacity, noDataLabel);
 
       return L.geoJson(geojson, {
         style: _style(scale, opacity, geojsonKeyField, featuresValues),
@@ -88,7 +89,7 @@ ckan.module('choroplethmap', function ($) {
              .range(colors);
   }
 
-  function _addLegend(map, scale, opacity) {
+  function _addLegend(map, scale, opacity, noDataLabel) {
     var legend = L.control({ position: 'bottomright' });
 
     legend.onAdd = function (map) {
@@ -112,7 +113,7 @@ ckan.module('choroplethmap', function ($) {
 
       ul.innerHTML +=
           '<li><span style="background:' + noDataColor + '; opacity: ' + opacity + '"></span> ' +
-          'No Data</li>';
+          noDataLabel + '</li>';
 
       return div;
     }
@@ -173,6 +174,11 @@ ckan.module('choroplethmap', function ($) {
   }
 
   return {
+    options: {
+      i18n: {
+        noData: _('No data')
+      }
+    },
     initialize: initialize
   };
 });
