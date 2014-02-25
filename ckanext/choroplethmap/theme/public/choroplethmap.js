@@ -12,7 +12,7 @@ ckan.module('choroplethmap', function ($) {
         map = L.map(elementId),
         resource = {
           id: options.resourceId,
-          endpoint: options.endpoint || window.location.origin + '/api'
+          endpoint: options.endpoint || this.sandbox.client.endpoint + '/api'
         };
 
     $.when(
