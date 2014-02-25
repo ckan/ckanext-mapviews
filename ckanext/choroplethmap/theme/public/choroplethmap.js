@@ -21,12 +21,13 @@ ckan.module('choroplethmap', function ($) {
     ).done(function (geojson, query) {
       var geojsonLayer,
           bounds,
+          opacity = 0.7,
           featuresValues = _mapResourceKeyFieldToValues(resourceKeyField,
                                                         resourceValueField,
                                                         resourceLabelField,
                                                         query.hits);
       _addBaseLayer(map);
-      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, featuresValues);
+      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, featuresValues);
       bounds = geojsonLayer.getBounds();
 
       map.fitBounds(bounds);
@@ -59,13 +60,13 @@ ckan.module('choroplethmap', function ($) {
     }).addTo(map);
   }
 
-  function _addGeoJSONLayer(map, geojson, geojsonKeyField, featuresValues) {
+  function _addGeoJSONLayer(map, geojson, geojsonKeyField, opacity, featuresValues) {
       var scale = _createScale(geojson, featuresValues);
 
-      _addLegend(map, scale);
+      _addLegend(map, scale, opacity);
 
       return L.geoJson(geojson, {
-        style: _style(scale, geojsonKeyField, featuresValues),
+        style: _style(scale, opacity, geojsonKeyField, featuresValues),
         onEachFeature: _onEachFeature(geojsonKeyField, featuresValues)
       }).addTo(map);
   }
@@ -84,7 +85,7 @@ ckan.module('choroplethmap', function ($) {
              .range(colors);
   }
 
-  function _addLegend(map, scale) {
+  function _addLegend(map, scale, opacity) {
     var legend = L.control({ position: 'bottomright' });
 
     legend.onAdd = function (map) {
@@ -99,7 +100,7 @@ ckan.module('choroplethmap', function ($) {
 
       for (var i = 0, len = grades.length; i < len; i++) {
           div.innerHTML +=
-              '<i style="background:' + scale(grades[i]) + '"></i> ' +
+              '<i style="background:' + scale(grades[i]) + '; opacity: ' + opacity + '"></i> ' +
               _formatNumber(grades[i]) +
                 (grades[i + 1] ? '&ndash;' + _formatNumber(grades[i + 1]) + '<br>' : '+');
       }
@@ -110,11 +111,11 @@ ckan.module('choroplethmap', function ($) {
     legend.addTo(map);
   }
 
-  function _style(scale, geojsonKeyField, featuresValues) {
+  function _style(scale, opacity, geojsonKeyField, featuresValues) {
     return function (feature) {
       return {
         fillColor: scale(featuresValues[feature.properties[geojsonKeyField]].value),
-        fillOpacity: 1,
+        fillOpacity: opacity,
         weight: 2,
         color: '#031127'
       };
