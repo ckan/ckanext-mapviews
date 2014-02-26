@@ -97,7 +97,7 @@ ckan.module('choroplethmap', function ($, _) {
           ul = L.DomUtil.create('ul', 'legend'),
           domain = scale.domain(),
           range = scale.range(),
-          min = domain[0],
+          min = domain[0] + 0.0000000001,
           max = domain[domain.length - 1],
           step = (max - min)/range.length,
           grades = $.map(range, function (_, i) { return (min + step * i); }),
