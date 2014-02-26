@@ -23,7 +23,7 @@ ckan.module('choroplethmap', function ($, _) {
 
     $.when(
       $.getJSON(geojsonUrl),
-      recline.Backend.Ckan.query({}, resource)
+      recline.Backend.Ckan.query({ size: 1000 }, resource)
     ).done(function (geojson, query) {
       var geojsonLayer,
           bounds,
