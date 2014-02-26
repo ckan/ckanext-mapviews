@@ -34,7 +34,7 @@ ckan.module('choroplethmap', function ($, _) {
                                                         query.hits);
       _addBaseLayer(map);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, noDataLabel, featuresValues);
-      bounds = geojsonLayer.getBounds();
+      bounds = geojsonLayer.getBounds().pad(0.1);
 
       map.fitBounds(bounds);
       map.setMaxBounds(bounds);
