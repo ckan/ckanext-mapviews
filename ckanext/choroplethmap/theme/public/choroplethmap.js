@@ -3,9 +3,24 @@ ckan.module('choroplethmap', function ($, _) {
 
   var noDataColor = '#F7FBFF',
       borderColor = '#031127',
-      activeBorderColor = '#D73027',
+      opacity = 0.7,
       colors = ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6',
-                '#2171B5', '#08519C', '#08306B'];
+                '#2171B5', '#08519C', '#08306B'],
+      defaultStyle = {
+        // fillColor will be set depending on the feature's value
+        fillOpacity: opacity,
+        weight: 2,
+        color: borderColor
+      },
+      highlightStyle = {
+        weight: 5
+      },
+      nonHighlightedStyle = {
+        weight: 2
+      },
+      activeStyle = {
+        color: '#D73027'
+      };
 
   function initialize() {
     var elementId = this.el.context.id,
@@ -28,15 +43,13 @@ ckan.module('choroplethmap', function ($, _) {
     ).done(function (geojson, query) {
       var geojsonLayer,
           bounds,
-          opacity = 0.7,
-          onClickRegion,
+          router = _router(resourceKeyField, geojsonKeyField),
           featuresValues = _mapResourceKeyFieldToValues(resourceKeyField,
                                                         resourceValueField,
                                                         resourceLabelField,
                                                         query.hits);
       _addBaseLayer(map);
-      onClickRegion = _activateFeature(resourceKeyField, geojsonKeyField);
-      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, noDataLabel, featuresValues, onClickRegion);
+      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, noDataLabel, featuresValues, router);
       bounds = geojsonLayer.getBounds().pad(0.1);
 
       map.fitBounds(bounds);
@@ -69,14 +82,14 @@ ckan.module('choroplethmap', function ($, _) {
     }).addTo(map);
   }
 
-  function _addGeoJSONLayer(map, geojson, geojsonKeyField, opacity, noDataLabel, featuresValues, onClick) {
+  function _addGeoJSONLayer(map, geojson, geojsonKeyField, opacity, noDataLabel, featuresValues, router) {
       var scale = _createScale(geojson, featuresValues);
 
       _addLegend(map, scale, opacity, noDataLabel);
 
       return L.geoJson(geojson, {
         style: _style(scale, opacity, geojsonKeyField, featuresValues),
-        onEachFeature: _onEachFeature(geojsonKeyField, featuresValues, onClick)
+        onEachFeature: _onEachFeature(geojsonKeyField, featuresValues, router)
       }).addTo(map);
   }
 
@@ -129,27 +142,24 @@ ckan.module('choroplethmap', function ($, _) {
       var value = featuresValues[feature.properties[geojsonKeyField]],
           color = (value) ? scale(value.value) : noDataColor;
 
-      return {
-        fillColor: color,
-        fillOpacity: opacity,
-        weight: 2,
-        color: borderColor
-      };
+      return $.extend({ fillColor: color }, defaultStyle);
     };
   }
 
-  function _onEachFeature(geojsonKeyField, featuresValues, onClick) {
+  function _onEachFeature(geojsonKeyField, featuresValues, router) {
     return function (feature, layer) {
       var elementData = featuresValues[feature.properties[geojsonKeyField]];
 
       if (elementData && elementData.label && elementData.value) {
         var label = elementData.label + ': ' + elementData.value;
 
+        router.activateIfNeeded(layer);
+
         layer.bindLabel(label);
         layer.on({
           mouseover: _highlightFeature,
           mouseout: _resetHighlight,
-          click: onClick
+          click: router.activate
         });
       }
     }
@@ -162,9 +172,7 @@ ckan.module('choroplethmap', function ($, _) {
   function _highlightFeature(e) {
     var layer = e.target;
 
-    layer.setStyle({
-      weight: 5
-    });
+    layer.setStyle(highlightStyle);
 
     if (!L.Browser.ie && !L.Browser.opera) {
       layer.bringToFront();
@@ -172,13 +180,44 @@ ckan.module('choroplethmap', function ($, _) {
   }
 
   function _resetHighlight(e) {
-    e.target.setStyle({
-      weight: 2
-    });
+    e.target.setStyle(nonHighlightedStyle);
   }
 
-  function _activateFeature(filterName, geojsonKeyField) {
+  function _router(filterName, geojsonKeyField) {
     var activeFeatures = [];
+
+    activeFeatures = _getActiveFilters();
+
+    function activate(e) {
+      var layer = e.target,
+          id = layer.feature.properties[geojsonKeyField],
+          index = $.inArray(id, activeFeatures);
+
+      if (index !== -1) {
+        activeFeatures.splice(index, 1);
+        layer.setStyle(defaultStyle);
+      } else {
+        activeFeatures.push(id);
+        layer.setStyle(activeStyle);
+      }
+
+      window.location.search = $.param(_updateFilters(filterName, activeFeatures));
+    }
+
+    function activateIfNeeded(layer) {
+      var id = layer.feature.properties[geojsonKeyField];
+
+      if ($.inArray(id, activeFeatures) !== -1) {
+        layer.setStyle(activeStyle);
+      }
+    }
+
+    function _getActiveFilters() {
+      var routeParams = window.location.search.queryStringToJSON(),
+          filters = _parseRouteFilters(routeParams);
+
+      return filters[filterName] || [];
+    }
 
     function _updateFilters(filterName, features) {
       var routeParams = window.location.search.queryStringToJSON(),
@@ -186,55 +225,46 @@ ckan.module('choroplethmap', function ($, _) {
 
       filters[filterName] = (filters[filterName] || []).concat(features);
       routeParams.filters = $.map(filters, function (fields, filter) {
-        var fieldsStr = $.map(fields, function (field) {
+        var fieldsStr = $.map(_unique(fields), function (field) {
           return filter + ':' + field;
         });
 
         return fieldsStr.join('|');
       }).join('|');
 
-      window.location.search = $.param(routeParams);
+      return routeParams;
     }
 
-    return function (e) {
-      var layer = e.target,
-          id = layer.feature.properties[geojsonKeyField],
-          index = $.inArray(id, activeFeatures);
-
-      if (index !== -1) {
-        activeFeatures.splice(index, 1);
-        layer.setStyle({
-          color: borderColor
-        });
-      } else {
-        activeFeatures.push(id);
-        layer.setStyle({
-          color: activeBorderColor
-        });
+    function _parseRouteFilters(routeParams) {
+      // The filters are in format "field:value|field:value|field:value"
+      if (!routeParams || !routeParams.filters) {
+        return {};
       }
+      var filters = {},
+          fieldValuesStr = routeParams.filters.split("|");
 
-      _updateFilters(filterName, activeFeatures);
-    };
-  }
+      $.each(fieldValuesStr, function (i, fieldValueStr) {
+        var fieldValue = fieldValueStr.split(":"),
+            field = fieldValue[0],
+            value = fieldValue[1];
 
-  function _parseRouteFilters(routeParams) {
-    // The filters are in format "field:value|field:value|field:value"
-    if (!routeParams || !routeParams.filters) {
-      return {};
+        filters[field] = filters[field] || [];
+        filters[field].push(value);
+      });
+
+      return filters;
     }
-    var filters = {},
-        fieldValuesStr = routeParams.filters.split("|");
 
-    $.each(fieldValuesStr, function (i, fieldValueStr) {
-      var fieldValue = fieldValueStr.split(":"),
-          field = fieldValue[0],
-          value = fieldValue[1];
+    function _unique(array) {
+      return $.grep(array, function (el, index) {
+        return index == $.inArray(el, array);
+      });
+    }
 
-      filters[field] = filters[field] || [];
-      filters[field].push(value);
-    });
-
-    return filters;
+    return {
+      activate: activate,
+      activateIfNeeded: activateIfNeeded
+    };
   }
 
 
