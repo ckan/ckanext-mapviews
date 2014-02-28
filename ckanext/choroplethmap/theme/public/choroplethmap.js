@@ -9,6 +9,7 @@ ckan.module('choroplethmap', function ($, _) {
       defaultStyle = {
         // fillColor will be set depending on the feature's value
         fillOpacity: opacity,
+        opacity: 0.1,
         weight: 2,
         color: borderColor
       },
@@ -19,7 +20,8 @@ ckan.module('choroplethmap', function ($, _) {
         weight: 2
       },
       activeStyle = {
-        color: '#D73027'
+        opacity: 1,
+        color: '#d73027'
       };
 
   function initialize() {
