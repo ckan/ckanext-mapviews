@@ -223,9 +223,9 @@ ckan.module('choroplethmap', function ($, _) {
       var routeParams = window.location.search.queryStringToJSON(),
           filters = _parseRouteFilters(routeParams);
 
-      filters[filterName] = (filters[filterName] || []).concat(features);
+      filters[filterName] = features;
       routeParams.filters = $.map(filters, function (fields, filter) {
-        var fieldsStr = $.map(_unique(fields), function (field) {
+        var fieldsStr = $.map(fields, function (field) {
           return filter + ':' + field;
         });
 
@@ -253,12 +253,6 @@ ckan.module('choroplethmap', function ($, _) {
       });
 
       return filters;
-    }
-
-    function _unique(array) {
-      return $.grep(array, function (el, index) {
-        return index == $.inArray(el, array);
-      });
     }
 
     return {
