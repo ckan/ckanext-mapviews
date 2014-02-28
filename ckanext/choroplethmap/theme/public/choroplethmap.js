@@ -176,19 +176,20 @@ ckan.module('choroplethmap', function ($, _) {
   }
 
   function _activateFeature() {
-    var activeFeatures = {};
+    var activeFeatures = [];
 
     return function (e) {
       var layer = e.target,
-          id = layer.feature.id;
+          id = layer.feature.id,
+          index = $.inArray(id, activeFeatures);
 
-      if (activeFeatures[id]) {
-        delete activeFeatures[id];
+      if (index !== -1) {
+        activeFeatures.splice(index, 1);
         layer.setStyle({
           color: borderColor
         });
       } else {
-        activeFeatures[id] = 5;
+        activeFeatures.push(id);
         layer.setStyle({
           color: activeBorderColor
         });
