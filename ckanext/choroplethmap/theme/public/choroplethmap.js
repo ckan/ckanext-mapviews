@@ -159,7 +159,7 @@ ckan.module('choroplethmap', function ($, _) {
         layer.on({
           mouseover: _highlightFeature,
           mouseout: _resetHighlight,
-          click: router.activate
+          click: router.toggleActive
         });
       }
     }
@@ -188,7 +188,7 @@ ckan.module('choroplethmap', function ($, _) {
 
     activeFeatures = _getActiveFilters();
 
-    function activate(e) {
+    function toggleActive(e) {
       var layer = e.target,
           id = layer.feature.properties[geojsonKeyField],
           index = $.inArray(id, activeFeatures);
@@ -256,7 +256,7 @@ ckan.module('choroplethmap', function ($, _) {
     }
 
     return {
-      activate: activate,
+      toggleActive: toggleActive,
       activateIfNeeded: activateIfNeeded
     };
   }
