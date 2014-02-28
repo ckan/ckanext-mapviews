@@ -3,6 +3,7 @@ ckan.module('choroplethmap', function ($, _) {
 
   var noDataColor = '#F7FBFF',
       borderColor = '#031127',
+      activeBorderColor = '#D73027',
       colors = ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6',
                 '#2171B5', '#08519C', '#08306B'];
 
@@ -145,7 +146,8 @@ ckan.module('choroplethmap', function ($, _) {
         layer.bindLabel(label);
         layer.on({
           mouseover: _highlightFeature,
-          mouseout: _resetHighlight
+          mouseout: _resetHighlight,
+          click: _activateFeature()
         });
       }
     }
@@ -171,6 +173,27 @@ ckan.module('choroplethmap', function ($, _) {
     e.target.setStyle({
       weight: 2
     });
+  }
+
+  function _activateFeature() {
+    var activeFeatures = {};
+
+    return function (e) {
+      var layer = e.target,
+          id = layer.feature.id;
+
+      if (activeFeatures[id]) {
+        delete activeFeatures[id];
+        layer.setStyle({
+          color: borderColor
+        });
+      } else {
+        activeFeatures[id] = 5;
+        layer.setStyle({
+          color: activeBorderColor
+        });
+      }
+    };
   }
 
   return {
