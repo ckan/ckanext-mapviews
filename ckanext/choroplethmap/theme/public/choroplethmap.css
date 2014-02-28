@@ -8,6 +8,10 @@
   height: 100%;
 }
 
+.choroplethmap .non-clickable {
+  cursor: default;
+}
+
 .choroplethmap .info {
   line-height: 18px;
   background-color: white;

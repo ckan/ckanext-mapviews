@@ -25,7 +25,8 @@ ckan.module('choroplethmap', function ($, _) {
       };
 
   function initialize() {
-    var elementId = this.el.context.id,
+    var el = this.el,
+        elementId = el.context.id,
         options = this.options,
         geojsonUrl = options.geojsonUrl,
         geojsonKeyField = options.geojsonKeyField,
@@ -45,11 +46,17 @@ ckan.module('choroplethmap', function ($, _) {
     ).done(function (geojson, query) {
       var geojsonLayer,
           bounds,
-          router = _router(resourceKeyField, geojsonKeyField),
+          router,
           featuresValues = _mapResourceKeyFieldToValues(resourceKeyField,
                                                         resourceValueField,
                                                         resourceLabelField,
                                                         query.hits);
+
+      var isInDashboard = $(el.parent().parent().parent()).hasClass('dashboard-grid');
+      if (isInDashboard) {
+        router = _router(resourceKeyField, geojsonKeyField);
+      }
+
       _addBaseLayer(map);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, noDataLabel, featuresValues, router);
       bounds = geojsonLayer.getBounds().pad(0.1);
@@ -134,7 +141,7 @@ ckan.module('choroplethmap', function ($, _) {
           noDataLabel + '</li>';
 
       return div;
-    }
+    };
 
     legend.addTo(map);
   }
@@ -149,22 +156,31 @@ ckan.module('choroplethmap', function ($, _) {
   }
 
   function _onEachFeature(geojsonKeyField, featuresValues, router) {
+    var eventsCallbacks = {
+      mouseover: _highlightFeature,
+      mouseout: _resetHighlight
+    };
+
+    if (router) {
+      eventsCallbacks.click = router.toggleActive;
+    }
+
     return function (feature, layer) {
       var elementData = featuresValues[feature.properties[geojsonKeyField]];
 
       if (elementData && elementData.label && elementData.value) {
         var label = elementData.label + ': ' + elementData.value;
 
-        router.activateIfNeeded(layer);
+        if (router) {
+          router.activateIfNeeded(layer);
+        } else {
+          layer.setStyle({ className: 'non-clickable' });
+        }
 
         layer.bindLabel(label);
-        layer.on({
-          mouseover: _highlightFeature,
-          mouseout: _resetHighlight,
-          click: router.toggleActive
-        });
+        layer.on(eventsCallbacks);
       }
-    }
+    };
   }
 
   function _formatNumber(num) {
