@@ -70,10 +70,16 @@ ckan.module('choroplethmap', function ($, _) {
     var mapping = {};
 
     $.each(data, function (i, d) {
-      mapping[d[resourceKeyField]] = {
-        label: d[resourceLabelField],
-        value: parseFloat(d[resourceValueField])
-      };
+      var key = d[resourceKeyField],
+          label = d[resourceLabelField],
+          value = d[resourceValueField];
+
+      if (value) {
+        mapping[key] = {
+          label: label,
+          value: parseFloat(value)
+        };
+      }
     });
 
     return mapping;
