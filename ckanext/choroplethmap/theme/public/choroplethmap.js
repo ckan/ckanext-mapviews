@@ -53,8 +53,8 @@ ckan.module('choroplethmap', function ($, _) {
                                                         resourceLabelField,
                                                         query.hits);
 
-      var isInDashboard = $(el.parent().parent().parent()).hasClass('dashboard-grid');
-      if (isInDashboard) {
+      var isInOwnResourceViewPage = $(el.parent()).hasClass('ckanext-datapreview');
+      if (!isInOwnResourceViewPage) {
         router = _router(resourceKeyField, geojsonKeyField, redirectToUrl);
       }
 
