@@ -6,6 +6,7 @@ import pylons.config as config
 Invalid = p.toolkit.Invalid
 _ = p.toolkit._
 not_empty = p.toolkit.get_validator('not_empty')
+ignore_missing = p.toolkit.get_validator('ignore_missing')
 
 
 def url_is_relative_or_in_same_domain(url):
@@ -39,6 +40,7 @@ class ChoroplethMap(p.SingletonPlugin):
             'resource_key_field': [not_empty],
             'resource_value_field': [not_empty],
             'resource_label_field': [not_empty],
+            'redirect_to_url': [ignore_missing],
         }
 
         return {'name': 'choropleth-map',

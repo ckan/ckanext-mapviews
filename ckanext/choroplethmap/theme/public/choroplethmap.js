@@ -33,6 +33,7 @@ ckan.module('choroplethmap', function ($, _) {
         resourceKeyField = options.resourceKeyField,
         resourceValueField = options.resourceValueField,
         resourceLabelField = options.resourceLabelField,
+        redirectToUrl = (options.redirectToUrl === true) ? '' : options.redirectToUrl,
         noDataLabel = this.i18n('noData'),
         map = L.map(elementId),
         resource = {
@@ -54,7 +55,7 @@ ckan.module('choroplethmap', function ($, _) {
 
       var isInDashboard = $(el.parent().parent().parent()).hasClass('dashboard-grid');
       if (isInDashboard) {
-        router = _router(resourceKeyField, geojsonKeyField);
+        router = _router(resourceKeyField, geojsonKeyField, redirectToUrl);
       }
 
       _addBaseLayer(map);
@@ -207,7 +208,7 @@ ckan.module('choroplethmap', function ($, _) {
     e.target.setStyle(nonHighlightedStyle);
   }
 
-  function _router(filterName, geojsonKeyField) {
+  function _router(filterName, geojsonKeyField, redirectToUrl) {
     var activeFeatures = [];
 
     activeFeatures = _getActiveFilters();
@@ -225,7 +226,7 @@ ckan.module('choroplethmap', function ($, _) {
         layer.setStyle(activeStyle);
       }
 
-      window.location.search = $.param(_updateFilters(filterName, activeFeatures));
+      _redirectTo(redirectToUrl, _updateFilters(filterName, activeFeatures));
     }
 
     function activateIfNeeded(layer) {
@@ -241,6 +242,17 @@ ckan.module('choroplethmap', function ($, _) {
           filters = _parseRouteFilters(routeParams);
 
       return filters[filterName] || [];
+    }
+
+    function _redirectTo(url, filters) {
+      var originalParams = url.queryStringToJSON(),
+          params = $.extend({}, filters, originalParams),
+          aElement = document.createElement('a');
+
+      aElement.href = url;
+      aElement.search = $.param(params);
+
+      window.location.href = aElement.href;
     }
 
     function _updateFilters(filterName, features) {

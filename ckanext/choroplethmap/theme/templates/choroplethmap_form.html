@@ -2,6 +2,7 @@
 
 {{
     form.input('geojson_url', label=_('GeoJSON URL'),
+        classes=['long'],
         error=errors.geojson_url,
         value=resource_view['geojson_url'], is_required=true)
 }}
@@ -25,3 +26,11 @@
     form.select('resource_label_field', label=_('Label'), options=textual_fields,
         selected=resource_view['resource_label_field'], is_required=true)
 }}
+
+{{
+    form.input('redirect_to_url', label=_('Redirect to URL'),
+        classes=['long'],
+        value=resource_view['redirect_to_url'],
+        placeholder=_('If left blank, clicking on a region will update the filters on the same page'))
+}}
+

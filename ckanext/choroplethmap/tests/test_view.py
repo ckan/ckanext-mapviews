@@ -124,6 +124,17 @@ class TestChoroplethMap(object):
         assert not_empty in schema['resource_label_field'], \
             '"resource_label_field" should not be empty'
 
+    def test_schema_has_redirect_to_url(self):
+        schema = self.plugin.info()['schema']
+        assert schema.get('redirect_to_url') is not None, \
+            'Schema should define "redirect_to_url"'
+
+    def test_schema_redirect_to_url_isnt_required(self):
+        schema = self.plugin.info()['schema']
+        ignore_missing = p.toolkit.get_validator('ignore_missing')
+        assert ignore_missing in schema['redirect_to_url'], \
+            '"redirect_to_url" should not be required'
+
     def test_plugin_isnt_iframed(self):
         iframed = self.plugin.info().get('iframed', True)
         assert not iframed, 'Plugin should not be iframed'
