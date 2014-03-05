@@ -55,7 +55,8 @@ ckan.module('choroplethmap', function ($, _) {
 
       var isInOwnResourceViewPage = $(el.parent()).hasClass('ckanext-datapreview');
       if (!isInOwnResourceViewPage) {
-        router = _router(resourceKeyField, geojsonKeyField, redirectToUrl);
+        var filterFields = ["country", "district", "province"];
+        router = _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues);
       }
 
       _addBaseLayer(map);
@@ -77,8 +78,10 @@ ckan.module('choroplethmap', function ($, _) {
 
       if (value) {
         mapping[key] = {
+          key: key,
           label: label,
-          value: parseFloat(value)
+          value: parseFloat(value),
+          data: d
         };
       }
     });
@@ -208,40 +211,62 @@ ckan.module('choroplethmap', function ($, _) {
     e.target.setStyle(nonHighlightedStyle);
   }
 
-  function _router(filterName, geojsonKeyField, redirectToUrl) {
-    var activeFeatures = [];
+  function _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues) {
+    var activeFeatures = _getActiveFeatures(resourceKeyField, featuresValues);
 
-    activeFeatures = _getActiveFilters();
+    function _getActiveFeatures(filterName, features) {
+      var filters = _getFilters(),
+          activeFeaturesKeys = filters[filterName] || [],
+          result = [];
+
+      $.each(activeFeaturesKeys, function (i, key) {
+        result.push(features[key]);
+      });
+
+      return result;
+    }
 
     function toggleActive(e) {
       var layer = e.target,
           id = layer.feature.properties[geojsonKeyField],
-          index = $.inArray(id, activeFeatures);
+          filters = _getFilters(),
+          feature = featuresValues[id],
+          index = $.inArray(feature, activeFeatures);
 
+      // Toggle this feature
       if (index !== -1) {
         activeFeatures.splice(index, 1);
         layer.setStyle(defaultStyle);
       } else {
-        activeFeatures.push(id);
+        activeFeatures.push(feature);
         layer.setStyle(activeStyle);
       }
 
-      _redirectTo(redirectToUrl, _updateFilters(filterName, activeFeatures));
+      // Update filters
+      filters[resourceKeyField] = $.map(activeFeatures, function (feature) {
+        return $.map(filterFields, function (field) {
+          return feature.data[field];
+        });
+      });
+
+      _redirectTo(redirectToUrl, _updateFilters(filters));
     }
 
     function activateIfNeeded(layer) {
-      var id = layer.feature.properties[geojsonKeyField];
+      var id = layer.feature.properties[geojsonKeyField],
+          feature = featuresValues[id],
+          filters = _getFilters();
 
-      if ($.inArray(id, activeFeatures) !== -1) {
+      if ($.inArray(feature, activeFeatures) !== -1) {
         layer.setStyle(activeStyle);
       }
     }
 
-    function _getActiveFilters() {
+    function _getFilters() {
       var routeParams = window.location.search.queryStringToJSON(),
           filters = _parseRouteFilters(routeParams);
 
-      return filters[filterName] || [];
+      return filters;
     }
 
     function _redirectTo(url, filters) {
@@ -255,11 +280,9 @@ ckan.module('choroplethmap', function ($, _) {
       window.location.href = aElement.href;
     }
 
-    function _updateFilters(filterName, features) {
-      var routeParams = window.location.search.queryStringToJSON(),
-          filters = _parseRouteFilters(routeParams);
+    function _updateFilters(filters) {
+      var routeParams = window.location.search.queryStringToJSON();
 
-      filters[filterName] = features;
       routeParams.filters = $.map(filters, function (fields, filter) {
         var fieldsStr = $.map(fields, function (field) {
           return filter + ':' + field;
