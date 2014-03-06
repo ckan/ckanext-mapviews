@@ -175,6 +175,18 @@ class TestChoroplethMap(object):
         assert template_variables['resource_view'] == resource_view
 
     @mock.patch('ckan.plugins.toolkit.get_action')
+    def test_setup_template_variables_resource_view_converts_filter_fields_to_list(self, _):
+        resource_view = {
+            'filter_fields': 'value'
+        }
+
+        template_variables = \
+            self._setup_template_variables(resource_view=resource_view)
+
+        resource_view = template_variables['resource_view']
+        assert resource_view['filter_fields'] == ['value']
+
+    @mock.patch('ckan.plugins.toolkit.get_action')
     def test_setup_template_variables_adds_fields_without_the_id(self, get_action):
         fields = [
             {'id': '_id', 'type': 'int4'},

@@ -7,6 +7,7 @@ Invalid = p.toolkit.Invalid
 _ = p.toolkit._
 not_empty = p.toolkit.get_validator('not_empty')
 ignore_missing = p.toolkit.get_validator('ignore_missing')
+aslist = p.toolkit.aslist
 
 
 def url_is_relative_or_in_same_domain(url):
@@ -58,7 +59,8 @@ class ChoroplethMap(p.SingletonPlugin):
     def setup_template_variables(self, context, data_dict):
         resource = data_dict['resource']
         resource_view = data_dict['resource_view']
-        resource_view['filter_fields'] = resource_view.get('filter_fields', [])
+        filter_fields = aslist(resource_view.get('filter_fields', []))
+        resource_view['filter_fields'] = filter_fields
         fields = _get_fields(resource)
         fields_without_id = _remove_id_and_prepare_to_template(fields)
         numeric_fields = _filter_numeric_fields_without_id(fields)
