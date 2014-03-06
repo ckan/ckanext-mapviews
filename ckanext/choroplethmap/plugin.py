@@ -41,6 +41,7 @@ class ChoroplethMap(p.SingletonPlugin):
             'resource_value_field': [not_empty],
             'resource_label_field': [not_empty],
             'redirect_to_url': [ignore_missing],
+            'filter_fields': [ignore_missing],
         }
 
         return {'name': 'choropleth-map',

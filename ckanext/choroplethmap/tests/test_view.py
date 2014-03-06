@@ -135,6 +135,17 @@ class TestChoroplethMap(object):
         assert ignore_missing in schema['redirect_to_url'], \
             '"redirect_to_url" should not be required'
 
+    def test_schema_has_filter_fields(self):
+        schema = self.plugin.info()['schema']
+        assert schema.get('filter_fields') is not None, \
+            'Schema should define "filter_fields"'
+
+    def test_schema_filter_fields_isnt_required(self):
+        schema = self.plugin.info()['schema']
+        ignore_missing = p.toolkit.get_validator('ignore_missing')
+        assert ignore_missing in schema['filter_fields'], \
+            '"filter_fields" should not be required'
+
     def test_plugin_isnt_iframed(self):
         iframed = self.plugin.info().get('iframed', True)
         assert not iframed, 'Plugin should not be iframed'

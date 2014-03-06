@@ -1,5 +1,31 @@
 {% import 'macros/form.html' as form %}
 
+{% macro filterFields(name, label='', options='', error='', fields={}, classes=[], attrs={}, is_required=false) %}
+  {% set classes = (classes|list) %}
+  {% do classes.append('control-select') %}
+
+  {%- set extra_html = caller() if caller -%}
+  {% call form.input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
+  <div class="choropleth-map-fields">
+    {% for field in fields %}
+      {{ removableSelect(name, options=options, selected=field, attrs=attrs) }}
+    {% endfor %}
+    </div>
+    <a href="#" class="choropleth-map-addField">{{ _('Add Field') }}</a>
+  {% endcall %}
+{% endmacro %}
+
+{% macro removableSelect(name, options='', selected='', attrs={}) %}
+  <div>
+  <select id="{{ name }}" name="{{ name }}" {{ form.attributes(attrs) }}>
+    {% for option in options %}
+      <option value="{{ option.value }}"{% if option.value == selected %} selected{% endif %}>{{ option.text or option.value }}</option>
+    {% endfor %}
+  </select>
+  <span title="{{ _('Remove Field') }}" class="choropleth-map-removeField icon icon-remove"></span>
+  </div>
+{% endmacro %}
+
 {{
     form.input('geojson_url', label=_('GeoJSON URL'),
         classes=['long'],
@@ -34,3 +60,18 @@
         placeholder=_('If left blank, clicking on a region will update the filters on the same page'))
 }}
 
+{% set templateFieldInputs = removableSelect('filter_fields', options=fields) %}
+
+<div
+  data-module = "basiccharts_filters_form"
+  data-module-template-filter-inputs = "{{ h.remove_linebreaks(templateFieldInputs) }}"
+  data-module-filters-selector = ".choropleth-map-fields"
+  data-module-add-filter-selector = ".choropleth-map-addField"
+  data-module-remove-filter-selector = ".choropleth-map-removeField"
+  >
+  {{
+      filterFields('filter_fields',
+          label=_('Fields'), options=fields,
+          fields=resource_view['filter_fields'])
+  }}
+</div>

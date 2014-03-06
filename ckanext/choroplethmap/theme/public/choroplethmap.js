@@ -34,6 +34,7 @@ ckan.module('choroplethmap', function ($, _) {
         resourceValueField = options.resourceValueField,
         resourceLabelField = options.resourceLabelField,
         redirectToUrl = (options.redirectToUrl === true) ? '' : options.redirectToUrl,
+        filterFields = options.filterFields,
         noDataLabel = this.i18n('noData'),
         map = L.map(elementId),
         resource = {
@@ -55,7 +56,6 @@ ckan.module('choroplethmap', function ($, _) {
 
       var isInOwnResourceViewPage = $(el.parent()).hasClass('ckanext-datapreview');
       if (!isInOwnResourceViewPage) {
-        var filterFields = ["country", "district", "province"];
         router = _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues);
       }
 
