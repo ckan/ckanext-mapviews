@@ -212,7 +212,10 @@ ckan.module('choroplethmap', function ($, _) {
   }
 
   function _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues) {
-    var activeFeatures = _getActiveFeatures(resourceKeyField, featuresValues);
+    var activeFeatures = _getActiveFeatures(resourceKeyField, featuresValues),
+        filterFieldsWithResourceKeyField = filterFields.slice();
+
+    filterFieldsWithResourceKeyField.push(resourceKeyField);
 
     function _getActiveFeatures(filterName, features) {
       var filters = _getFilters(),
@@ -244,7 +247,7 @@ ckan.module('choroplethmap', function ($, _) {
 
       // Update filters
       filters[resourceKeyField] = $.map(activeFeatures, function (feature) {
-        return $.map(filterFields, function (field) {
+        return $.map(filterFieldsWithResourceKeyField, function (field) {
           return feature.data[field];
         });
       });
