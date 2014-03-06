@@ -58,6 +58,7 @@ class ChoroplethMap(p.SingletonPlugin):
     def setup_template_variables(self, context, data_dict):
         resource = data_dict['resource']
         resource_view = data_dict['resource_view']
+        resource_view['filter_fields'] = resource_view.get('filter_fields', [])
         fields = _get_fields(resource)
         fields_without_id = _remove_id_and_prepare_to_template(fields)
         numeric_fields = _filter_numeric_fields_without_id(fields)

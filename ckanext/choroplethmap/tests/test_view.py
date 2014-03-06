@@ -230,6 +230,14 @@ class TestChoroplethMap(object):
         assert returned_fields is not None
         assert returned_fields == expected_fields
 
+    @mock.patch('ckan.plugins.toolkit.get_action')
+    def test_setup_template_variables_adds_default_filter_fields(self, get_action):
+        template_variables = self._setup_template_variables()
+
+        filter_fields = template_variables['resource_view'].get('filter_fields')
+        assert filter_fields is not None
+        assert filter_fields == []
+
     def _setup_template_variables(self, resource={'id': 'id'}, resource_view={}):
         context = {}
         data_dict = {
