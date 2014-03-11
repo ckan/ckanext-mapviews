@@ -1,6 +1,8 @@
 ckanext-choroplethmap
 =====================
 
+![Pakistan choropleth map](doc/img/pakistan.png)
+
 This extension adds choropleth maps to CKAN, using the new Resource View being
 developed in https://github.com/ckan/ckan/tree/1251-resource-view.
 
