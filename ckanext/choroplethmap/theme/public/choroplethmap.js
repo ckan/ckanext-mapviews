@@ -78,13 +78,14 @@ ckan.module('choroplethmap', function ($, _) {
           label = d[resourceLabelField],
           value = d[resourceValueField];
 
+      mapping[key] = {
+        key: key,
+        label: label,
+        data: d
+      };
+
       if (value) {
-        mapping[key] = {
-          key: key,
-          label: label,
-          value: parseFloat(value),
-          data: d
-        };
+        mapping[key].value = parseFloat(value);
       }
     });
 
@@ -110,7 +111,7 @@ ckan.module('choroplethmap', function ($, _) {
 
       return L.geoJson(geojson, {
         style: _style(scale, opacity, geojsonKeyField, featuresValues),
-        onEachFeature: _onEachFeature(geojsonKeyField, featuresValues, router)
+        onEachFeature: _onEachFeature(geojsonKeyField, featuresValues, router, noDataLabel)
       }).addTo(map);
   }
 
@@ -159,15 +160,15 @@ ckan.module('choroplethmap', function ($, _) {
   }
 
   function _style(scale, opacity, geojsonKeyField, featuresValues) {
-    return function (feature) {
-      var value = featuresValues[feature.properties[geojsonKeyField]],
-          color = (value) ? scale(value.value) : noDataColor;
+    return function (geojsonFeature) {
+      var feature = featuresValues[geojsonFeature.properties[geojsonKeyField]],
+          color = (feature && feature.value) ? scale(feature.value) : noDataColor;
 
       return $.extend({ fillColor: color }, defaultStyle);
     };
   }
 
-  function _onEachFeature(geojsonKeyField, featuresValues, router) {
+  function _onEachFeature(geojsonKeyField, featuresValues, router, noDataLabel) {
     var eventsCallbacks = {
       mouseover: _highlightFeature,
       mouseout: _resetHighlight
@@ -186,8 +187,9 @@ ckan.module('choroplethmap', function ($, _) {
         layer.setStyle({ className: 'non-clickable' });
       }
 
-      if (elementData && elementData.label && elementData.value) {
-        var label = elementData.label + ': ' + elementData.value;
+      if (elementData && elementData.label) {
+        var value = (elementData.value) ? elementData.value : noDataLabel,
+            label = elementData.label + ': ' + value;
 
         layer.bindLabel(label);
         layer.on(eventsCallbacks);
