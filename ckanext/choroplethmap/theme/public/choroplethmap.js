@@ -180,7 +180,7 @@ ckan.module('choroplethmap', function ($, _) {
     return function (feature, layer) {
       var elementData = featuresValues[feature.properties[geojsonKeyField]];
 
-      if (router) {
+      if (router && elementData) {
         router.activateIfNeeded(layer);
       } else {
         layer.setStyle({ className: 'non-clickable' });
