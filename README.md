@@ -76,7 +76,7 @@ attribute in the GeoJSON feature's properties. Opening that file, we see:
         "name": "Afghanistan",
         "region_un": "Asia",
         "region_wb": "South Asia",
-        "adm0_a3": "AFG",
+        "wb_a3": "AFG",
         // ...
       },
       "type": "Feature"
@@ -87,7 +87,7 @@ attribute in the GeoJSON feature's properties. Opening that file, we see:
 ```
 
 We can map either ```Country Name``` with ```name```, or ```Country Code```
-with ```adm0_a3```. Let's use the country code.
+with ```wb_a3```. Let's use the country code.
 
 In your CKAN instance, create a new dataset (i.e. "World Bank's Indicators"),
 and upload two resources: the GeoJSON and the data file.
@@ -101,7 +101,7 @@ link (it should look like
 ```http://demo.ckan.org/dataset/f07ffd99-739b-465f-93e9-bfx2576b1b5d/resource/e24c50f4-48e7-4bc4-9e12-54f3141bcf5b/download/countries.geojson```),
 and paste in that field.
 
-The ```GeoJSON Key Field``` should be ```adm0_a3```, as we found out before.
+The ```GeoJSON Key Field``` should be ```wb_a3```, as we found out before.
 We'll link that field to the ```Country Code``` column in our data, so set it
 in the ```Key``` field.
 
@@ -112,7 +112,7 @@ leave the remaining fields blank. In the end, we'll have:
 | GeoJSON URL |
 http://demo.ckan.org/dataset/f07ffd99-739b-465f-93e9-bfx2576b1b5d/resource/e24c50f4-48e7-4bc4-9e12-54f3141bcf5b/download/countries.geojson
 |
-| GeoJSON Key Field | adm0_a3 |
+| GeoJSON Key Field | wb_a3 |
 | Key | Country Code |
 | Value | 2012 |
 | Label | Country Name |
