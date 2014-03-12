@@ -98,7 +98,7 @@ the globe" as a title, leave the description empty (if you want). Then, we need
 to add the GeoJSON. We need two things: its URL and the key field. To get the
 URL, go to its resource page (that you just created), copy the download
 link (it should look like
-```http://demo.ckan.org/dataset/f07ffd99-739b-465f-93e9-bfx2576b1b5d/resource/e24c50f4-48e7-4bc4-9e12-54f3141bcf5b/download/countries.geojson```),
+http://demo.ckan.org/dataset/f07ffd99-739b-465f-93e9-bfx2576b1b5d/resource/e24c50f4-48e7-4bc4-9e12-54f3141bcf5b/download/countries.geojson),
 and paste in that field.
 
 The ```GeoJSON Key Field``` should be ```wb_a3```, as we found out before.
