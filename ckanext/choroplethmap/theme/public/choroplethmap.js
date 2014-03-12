@@ -48,6 +48,7 @@ ckan.module('choroplethmap', function ($, _) {
     ).done(function (geojson, query) {
       var geojsonLayer,
           bounds,
+          maxBounds,
           router,
           featuresValues = _mapResourceKeyFieldToValues(resourceKeyField,
                                                         resourceValueField,
@@ -61,10 +62,11 @@ ckan.module('choroplethmap', function ($, _) {
 
       _addBaseLayer(map);
       geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, noDataLabel, featuresValues, router);
-      bounds = geojsonLayer.getBounds().pad(0.1);
+      bounds = geojsonLayer.getBounds();
+      maxBounds = bounds.pad(0.1);
 
       map.fitBounds(bounds);
-      map.setMaxBounds(bounds);
+      map.setMaxBounds(maxBounds);
     });
   }
 
