@@ -51,7 +51,7 @@ comes from the great [World Bank's Data
 Bank](http://databank.worldbank.org/data/home.aspx). It looks like this:
 
 | Country Name   | Country Code | Indicator Name                  | Indicator Code | 2012             | ... |
-| -------------- | ------------ | ------------------------------- | -------------- | ---------------- | ... |
+| -------------- | ------------ | ------------------------------- | -------------- | ---------------- | --- |
 | Afghanistan    | AFG          | Internet users (per 100 people) | IT.NET.USER.P2 | 5.45454545454545 | ... |
 | Albania        | ALB          | Internet users (per 100 people) | IT.NET.USER.P2 | 54.6559590399494 | ... |
 | Algeria        | DZA          | Internet users (per 100 people) | IT.NET.USER.P2 | 15.2280267564417 | ... |
