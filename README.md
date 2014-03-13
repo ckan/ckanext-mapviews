@@ -45,19 +45,19 @@ Data](http://naturalearthdata.com/) website. We'll be using their [world map at
 1:110 million
 scale](https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_admin_0_countries.geojson).
 
-The data comes from the [World Bank's Data
-Bank](http://databank.worldbank.org/data/home.aspx). There we select the
-indicator we're interested in (Internet usage per 100 people), build a report
-for all countries, and download the data as CSV. It looks like this:
+We'll be plotting the [Internet usage per 100
+people in 2012](doc/internet-users-per-100-people.csv) all across the world. The data
+comes from the great [World Bank's Data
+Bank](http://databank.worldbank.org/data/home.aspx). It looks like this:
 
-| Country Name   | Country Code | Indicator Name                  | Indicator Code | 2012             |
-| -------------- | ------------ | ------------------------------- | -------------- | ---------------- |
-| Afghanistan    | AFG          | Internet users (per 100 people) | IT.NET.USER.P2 | 5.45454545454545 |
-| Albania        | ALB          | Internet users (per 100 people) | IT.NET.USER.P2 | 54.6559590399494 |
-| Algeria        | DZA          | Internet users (per 100 people) | IT.NET.USER.P2 | 15.2280267564417 |
-| American Samoa | ASM          | Internet users (per 100 people) | IT.NET.USER.P2 |                  |
-| Andorra        | ADO          | Internet users (per 100 people) | IT.NET.USER.P2 | 86.4344246167258 |
-| ...            | ...          | ...                             | ...            | ...              |
+| Country Name   | Country Code | Indicator Name                  | Indicator Code | 2012             | ... |
+| -------------- | ------------ | ------------------------------- | -------------- | ---------------- | ... |
+| Afghanistan    | AFG          | Internet users (per 100 people) | IT.NET.USER.P2 | 5.45454545454545 | ... |
+| Albania        | ALB          | Internet users (per 100 people) | IT.NET.USER.P2 | 54.6559590399494 | ... |
+| Algeria        | DZA          | Internet users (per 100 people) | IT.NET.USER.P2 | 15.2280267564417 | ... |
+| American Samoa | ASM          | Internet users (per 100 people) | IT.NET.USER.P2 |                  | ... |
+| Andorra        | ADO          | Internet users (per 100 people) | IT.NET.USER.P2 | 86.4344246167258 | ... |
+| ...            | ...          | ...                             | ...            | ...              | ... |
 
 To identify each country, we have its name and code. We need to have either
 attribute in the GeoJSON feature's properties. Opening that file, we see:
@@ -105,9 +105,9 @@ The ```GeoJSON Key Field``` should be ```wb_a3```, as we found out before.
 We'll link that field to the ```Country Code``` column in our data, so set it
 in the ```Key``` field.
 
-Now, we just need to select what value we want to plot (in our case,
-the ```2012``` column), and what label to use (```Country Name```). You can
-leave the remaining fields blank. In the end, we'll have:
+Now, we just need to select what value we want to plot (let's use the latest
+year, in the ```2012``` column), and what label to use (```Country Name```).
+You can leave the remaining fields blank. In the end, we'll have:
 
 | Attribute         | Value                                                                                                                                      |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -123,7 +123,10 @@ Click on ```Preview``` and you should see a map like:
 
 ![Worldwide Internet usage](doc/img/worldwide-internet-usage.png)
 
-Congratulations! You've just created your first choropleth map.
+Congratulations! You've just created your first choropleth map. You can go
+ahead and see how the maps look like in other years. We can't compare the maps
+directly, as the scales change depending on the data, but the difference from
+2000 to 2012 is still impressive.
 
 License
 -------
