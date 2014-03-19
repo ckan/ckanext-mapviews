@@ -1,4 +1,7 @@
-ckan.module('choroplethmap', function ($, _) {
+this.ckan = this.ckan || {};
+this.ckan.views = this.ckan.views || {};
+
+this.ckan.views.choroplethmap = (function () {
   'use strict';
 
   var noDataColor = '#F7FBFF',
@@ -24,10 +27,8 @@ ckan.module('choroplethmap', function ($, _) {
         color: '#d73027'
       };
 
-  function initialize() {
-    var el = this.el,
-        elementId = el.context.id,
-        options = this.options,
+  function initialize(element, options, noDataLabel) {
+    var elementId = element.context.id,
         geojsonUrl = options.geojsonUrl,
         geojsonKeyField = options.geojsonKeyField,
         resourceKeyField = options.resourceKeyField,
@@ -35,11 +36,10 @@ ckan.module('choroplethmap', function ($, _) {
         resourceLabelField = options.resourceLabelField,
         redirectToUrl = (options.redirectToUrl === true) ? '' : options.redirectToUrl,
         filterFields = options.filterFields,
-        noDataLabel = this.i18n('noData'),
         map = L.map(elementId),
         resource = {
           id: options.resourceId,
-          endpoint: options.endpoint || this.sandbox.client.endpoint + '/api'
+          endpoint: options.endpoint
         };
 
     $.when(
@@ -55,7 +55,7 @@ ckan.module('choroplethmap', function ($, _) {
                                                         resourceLabelField,
                                                         query.hits);
 
-      var isInOwnResourceViewPage = $(el.parent()).hasClass('ckanext-datapreview');
+      var isInOwnResourceViewPage = $(element.parent()).hasClass('ckanext-datapreview');
       if (!isInOwnResourceViewPage) {
         router = _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues);
       }
@@ -327,6 +327,21 @@ ckan.module('choroplethmap', function ($, _) {
     };
   }
 
+  return initialize;
+})();
+
+ckan.module('choroplethmap', function ($, _) {
+  'use strict';
+
+  function initialize() {
+    var self = this,
+        el = self.el,
+        options = self.options,
+        noDataLabel = self.i18n('noData');
+
+    options.endpoint = options.endpoint || self.sandbox.client.endpoint + '/api';
+    map = ckan.views.choroplethmap(el, options, noDataLabel);
+  }
 
   return {
     options: {
