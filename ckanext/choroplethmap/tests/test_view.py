@@ -29,16 +29,16 @@ def test_url_is_relative_or_in_same_domain_raises_if_not_on_the_same_domain():
     url_is_relative_or_in_same_domain("http://some-other-domain.com")
 
 
-class TestChoroplethMap(object):
+class TestNavigableMap(object):
 
     @classmethod
     def setup_class(cls):
-        p.load('choroplethmap')
-        cls.plugin = p.get_plugin('choroplethmap')
+        p.load('navigablemap')
+        cls.plugin = p.get_plugin('navigablemap')
 
     @classmethod
     def teardown_class(cls):
-        p.unload('choroplethmap')
+        p.unload('navigablemap')
 
     def test_plugin_templates_path_is_added_to_config(self):
         filename = inspect.getfile(inspect.currentframe())
@@ -58,6 +58,14 @@ class TestChoroplethMap(object):
             'resource': { 'datastore_active': False }
         }
         assert not self.plugin.can_view(inactive_datastore_data_dict)
+
+    def test_view_template_is_correct(self):
+        view_template = self.plugin.view_template({}, {})
+        assert view_template == 'navigablemap_view.html'
+
+    def test_form_template_is_correct(self):
+        form_template = self.plugin.form_template({}, {})
+        assert form_template == 'navigablemap_form.html'
 
     def test_schema_exists(self):
         schema = self.plugin.info()['schema']
@@ -101,17 +109,6 @@ class TestChoroplethMap(object):
         not_empty = p.toolkit.get_validator('not_empty')
         assert not_empty in schema['resource_key_field'], \
             '"resource_key_field" should not be empty'
-
-    def test_schema_has_resource_value_field(self):
-        schema = self.plugin.info()['schema']
-        assert schema.get('resource_value_field') is not None, \
-            'Schema should define "resource_value_field"'
-
-    def test_schema_resource_value_field_isnt_empty(self):
-        schema = self.plugin.info()['schema']
-        not_empty = p.toolkit.get_validator('not_empty')
-        assert not_empty in schema['resource_value_field'], \
-            '"resource_value_field" should not be empty'
 
     def test_schema_has_resource_label_field(self):
         schema = self.plugin.info()['schema']
@@ -257,3 +254,34 @@ class TestChoroplethMap(object):
             'resource_view': resource_view
         }
         return self.plugin.setup_template_variables(context, data_dict)
+
+
+class TestChoroplethMap(object):
+
+    @classmethod
+    def setup_class(cls):
+        p.load('choroplethmap')
+        cls.plugin = p.get_plugin('choroplethmap')
+
+    @classmethod
+    def teardown_class(cls):
+        p.unload('choroplethmap')
+
+    def test_view_template_is_correct(self):
+        view_template = self.plugin.view_template({}, {})
+        assert view_template == 'choroplethmap_view.html'
+
+    def test_form_template_is_correct(self):
+        form_template = self.plugin.form_template({}, {})
+        assert form_template == 'choroplethmap_form.html'
+
+    def test_schema_has_resource_value_field(self):
+        schema = self.plugin.info()['schema']
+        assert schema.get('resource_value_field') is not None, \
+            'Schema should define "resource_value_field"'
+
+    def test_schema_resource_value_field_isnt_empty(self):
+        schema = self.plugin.info()['schema']
+        not_empty = p.toolkit.get_validator('not_empty')
+        assert not_empty in schema['resource_value_field'], \
+            '"resource_value_field" should not be empty'

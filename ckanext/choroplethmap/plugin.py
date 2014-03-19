@@ -24,8 +24,8 @@ def url_is_relative_or_in_same_domain(url):
     return url
 
 
-class ChoroplethMap(p.SingletonPlugin):
-    '''Creates a choropleth map view'''
+class NavigableMap(p.SingletonPlugin):
+    '''Creates a map view'''
 
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IResourceView, inherit=True)
@@ -39,14 +39,13 @@ class ChoroplethMap(p.SingletonPlugin):
             'geojson_url': [not_empty, url_is_relative_or_in_same_domain],
             'geojson_key_field': [not_empty],
             'resource_key_field': [not_empty],
-            'resource_value_field': [not_empty],
             'resource_label_field': [not_empty],
             'redirect_to_url': [ignore_missing],
             'filter_fields': [ignore_missing],
         }
 
-        return {'name': 'choropleth-map',
-                'title': 'Choropleth Map',
+        return {'name': 'navigable-map',
+                'title': 'Navigable Map',
                 'icon': 'map-marker',
                 'sizex': 6,
                 'sizey': 4,
@@ -71,6 +70,24 @@ class ChoroplethMap(p.SingletonPlugin):
                 'fields': fields_without_id,
                 'numeric_fields': numeric_fields,
                 'textual_fields': textual_fields}
+
+    def view_template(self, context, data_dict):
+        return 'navigablemap_view.html'
+
+    def form_template(self, context, data_dict):
+        return 'navigablemap_form.html'
+
+
+class ChoroplethMap(NavigableMap):
+    '''Creates a choropleth map view'''
+
+    def info(self):
+        info = super(ChoroplethMap, self).info()
+        info['name'] = 'choropleth-map'
+        info['title'] = 'Choropleth Map'
+        info['schema']['resource_value_field'] = [not_empty]
+
+        return info
 
     def view_template(self, context, data_dict):
         return 'choroplethmap_view.html'

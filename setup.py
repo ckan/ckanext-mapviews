@@ -25,6 +25,7 @@ setup(
 	entry_points=\
 	"""
     [ckan.plugins]
+	navigablemap=ckanext.choroplethmap.plugin:NavigableMap
 	choroplethmap=ckanext.choroplethmap.plugin:ChoroplethMap
 	""",
 )

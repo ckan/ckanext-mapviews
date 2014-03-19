@@ -340,7 +340,7 @@ ckan.module('choroplethmap', function ($, _) {
         noDataLabel = self.i18n('noData');
 
     options.endpoint = options.endpoint || self.sandbox.client.endpoint + '/api';
-    map = ckan.views.choroplethmap(el, options, noDataLabel);
+    ckan.views.choroplethmap(el, options, noDataLabel);
   }
 
   return {
