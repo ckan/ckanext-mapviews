@@ -4,10 +4,9 @@ this.ckan.views = this.ckan.views || {};
 this.ckan.views.navigablemap = (function () {
   'use strict';
 
-  var noDataColor = '#F7FBFF',
-      borderColor = '#031127',
+  var borderColor = '#031127',
       defaultStyle = {
-        fillColor: '#FF00FF',
+        fillColor: '#4292C6',
         fillOpacity: 0.7,
         opacity: 0.1,
         weight: 2,
