@@ -42,7 +42,7 @@ this.ckan.views.navigablemap = (function () {
     }
 
     _addBaseLayer(map);
-    geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, noDataLabel, featuresValues, router);
+    geojsonLayer = _addGeoJSONLayer(map, geojson, geojsonKeyField, noDataLabel, featuresValues, router);
     bounds = geojsonLayer.getBounds();
     maxBounds = bounds.pad(0.1);
 

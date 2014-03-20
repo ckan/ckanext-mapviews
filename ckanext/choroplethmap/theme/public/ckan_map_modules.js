@@ -22,7 +22,7 @@
                                                             options.resourceLabelField,
                                                             query.hits);
 
-          ckan.views[mapType](el, options, noDataLabel, geojson, featuresValues);
+          ckan.views[mapType](el, options, noDataLabel, geojson[0], featuresValues);
         });
       }
 
