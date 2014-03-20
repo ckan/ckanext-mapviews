@@ -24,29 +24,18 @@ this.ckan.views.navigablemap = (function () {
         color: '#d73027'
       };
 
-  function initialize(element, options, noDataLabel, geojson, query) {
+  function initialize(element, options, noDataLabel, geojson, featuresValues) {
     var elementId = element.context.id,
         geojsonUrl = options.geojsonUrl,
         geojsonKeyField = options.geojsonKeyField,
         resourceKeyField = options.resourceKeyField,
-        resourceValueField = options.resourceValueField,
-        resourceLabelField = options.resourceLabelField,
         redirectToUrl = (options.redirectToUrl === true) ? '' : options.redirectToUrl,
         filterFields = options.filterFields,
         map = L.map(elementId),
-        resource = {
-          id: options.resourceId,
-          endpoint: options.endpoint
-        };
-
-    var geojsonLayer,
+        geojsonLayer,
         bounds,
         maxBounds,
-        router,
-        featuresValues = _mapResourceKeyFieldToValues(resourceKeyField,
-                                                      resourceValueField,
-                                                      resourceLabelField,
-                                                      query.hits);
+        router;
 
     var isInOwnResourceViewPage = $(element.parent()).hasClass('ckanext-datapreview');
     if (!isInOwnResourceViewPage) {
@@ -62,28 +51,6 @@ this.ckan.views.navigablemap = (function () {
     map.setMaxBounds(maxBounds);
 
     return map;
-  }
-
-  function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, resourceLabelField, data) {
-    var mapping = {};
-
-    $.each(data, function (i, d) {
-      var key = d[resourceKeyField],
-          label = d[resourceLabelField],
-          value = d[resourceValueField];
-
-      mapping[key] = {
-        key: key,
-        label: label,
-        data: d
-      };
-
-      if (value) {
-        mapping[key].value = parseFloat(value);
-      }
-    });
-
-    return mapping;
   }
 
   function _addBaseLayer(map) {
@@ -267,37 +234,3 @@ this.ckan.views.navigablemap = (function () {
 
   return initialize;
 })();
-
-ckan.module('navigablemap', function ($, _) {
-  'use strict';
-
-  function initialize() {
-    var self = this,
-        el = self.el,
-        options = self.options,
-        geojsonUrl = options.geojsonUrl,
-        noDataLabel = self.i18n('noData'),
-        resource = {
-          id: options.resourceId,
-          endpoint: options.endpoint || self.sandbox.client.endpoint + '/api'
-        };
-
-    options.endpoint = resource.endpoint;
-
-    $.when(
-      $.getJSON(geojsonUrl),
-      recline.Backend.Ckan.query({ size: 1000 }, resource)
-    ).done(function (geojson, query) {
-      ckan.views.navigablemap(el, options, noDataLabel, geojson, query);
-    });
-  }
-
-  return {
-    options: {
-      i18n: {
-        noData: _('No data')
-      }
-    },
-    initialize: initialize
-  };
-});

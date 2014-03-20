@@ -5,55 +5,26 @@ this.ckan.views.choroplethmap = (function () {
   'use strict';
 
   var noDataColor = '#F7FBFF',
-      borderColor = '#031127',
       opacity = 0.7,
       colors = ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6',
                 '#2171B5', '#08519C', '#08306B'],
       defaultStyle = {
         // fillColor will be set depending on the feature's value
         fillOpacity: opacity,
-        opacity: 0.1,
-        weight: 2,
-        color: borderColor
       };
 
-  function initialize(element, options, noDataLabel, geojson, query) {
-    var map = ckan.views.navigablemap(element, options, noDataLabel, geojson, query);
-    var featuresValues = _mapResourceKeyFieldToValues(options.resourceKeyField,
-                                                      options.resourceValueField,
-                                                      options.resourceLabelField,
-                                                      query.hits);
-    var scale = _createScale(featuresValues);
-    var onEachFeature = _onEachFeature(options.geojsonKeyField, featuresValues, noDataLabel, scale);
+  function initialize(element, options, noDataLabel, geojson, featuresValues) {
+    var map = ckan.views.navigablemap(element, options, noDataLabel, geojson, featuresValues),
+        scale = _createScale(featuresValues),
+        onEachFeature = _onEachFeature(options.geojsonKeyField, featuresValues, noDataLabel, scale);
+
+    _addLegend(map, scale, opacity, noDataLabel);
 
     $.each(map._layers, function (i, layer) {
       if (layer.feature !== undefined) {
         onEachFeature(layer.feature, layer);
       }
     });
-    _addLegend(map, scale, opacity, noDataLabel);
-  }
-
-  function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, resourceLabelField, data) {
-    var mapping = {};
-
-    $.each(data, function (i, d) {
-      var key = d[resourceKeyField],
-          label = d[resourceLabelField],
-          value = d[resourceValueField];
-
-      mapping[key] = {
-        key: key,
-        label: label,
-        data: d
-      };
-
-      if (value) {
-        mapping[key].value = parseFloat(value);
-      }
-    });
-
-    return mapping;
   }
 
   function _createScale(featuresValues) {
@@ -124,37 +95,3 @@ this.ckan.views.choroplethmap = (function () {
 
   return initialize;
 })();
-
-ckan.module('choroplethmap', function ($, _) {
-  'use strict';
-
-  function initialize() {
-    var self = this,
-        el = self.el,
-        options = self.options,
-        geojsonUrl = options.geojsonUrl,
-        noDataLabel = self.i18n('noData'),
-        resource = {
-          id: options.resourceId,
-          endpoint: options.endpoint || self.sandbox.client.endpoint + '/api'
-        };
-
-    options.endpoint = resource.endpoint;
-
-    $.when(
-      $.getJSON(geojsonUrl),
-      recline.Backend.Ckan.query({ size: 1000 }, resource)
-    ).done(function (geojson, query) {
-      ckan.views.choroplethmap(el, options, noDataLabel, geojson, query);
-    });
-  }
-
-  return {
-    options: {
-      i18n: {
-        noData: _('No data')
-      }
-    },
-    initialize: initialize
-  };
-});
