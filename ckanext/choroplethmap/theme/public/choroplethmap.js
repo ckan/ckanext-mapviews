@@ -15,59 +15,23 @@ this.ckan.views.choroplethmap = (function () {
         opacity: 0.1,
         weight: 2,
         color: borderColor
-      },
-      highlightStyle = {
-        weight: 5
-      },
-      nonHighlightedStyle = {
-        weight: 2
-      },
-      activeStyle = {
-        opacity: 1,
-        color: '#d73027'
       };
 
-  function initialize(element, options, noDataLabel) {
-    var elementId = element.context.id,
-        geojsonUrl = options.geojsonUrl,
-        geojsonKeyField = options.geojsonKeyField,
-        resourceKeyField = options.resourceKeyField,
-        resourceValueField = options.resourceValueField,
-        resourceLabelField = options.resourceLabelField,
-        redirectToUrl = (options.redirectToUrl === true) ? '' : options.redirectToUrl,
-        filterFields = options.filterFields,
-        map = L.map(elementId),
-        resource = {
-          id: options.resourceId,
-          endpoint: options.endpoint
-        };
+  function initialize(element, options, noDataLabel, geojson, query) {
+    var map = ckan.views.navigablemap(element, options, noDataLabel, geojson, query);
+    var featuresValues = _mapResourceKeyFieldToValues(options.resourceKeyField,
+                                                      options.resourceValueField,
+                                                      options.resourceLabelField,
+                                                      query.hits);
+    var scale = _createScale(featuresValues);
+    var onEachFeature = _onEachFeature(options.geojsonKeyField, featuresValues, noDataLabel, scale);
 
-    $.when(
-      $.getJSON(geojsonUrl),
-      recline.Backend.Ckan.query({ size: 1000 }, resource)
-    ).done(function (geojson, query) {
-      var geojsonLayer,
-          bounds,
-          maxBounds,
-          router,
-          featuresValues = _mapResourceKeyFieldToValues(resourceKeyField,
-                                                        resourceValueField,
-                                                        resourceLabelField,
-                                                        query.hits);
-
-      var isInOwnResourceViewPage = $(element.parent()).hasClass('ckanext-datapreview');
-      if (!isInOwnResourceViewPage) {
-        router = _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues);
+    $.each(map._layers, function (i, layer) {
+      if (layer.feature !== undefined) {
+        onEachFeature(layer.feature, layer);
       }
-
-      _addBaseLayer(map);
-      geojsonLayer = _addGeoJSONLayer(map, geojson[0], geojsonKeyField, opacity, noDataLabel, featuresValues, router);
-      bounds = geojsonLayer.getBounds();
-      maxBounds = bounds.pad(0.1);
-
-      map.fitBounds(bounds);
-      map.setMaxBounds(maxBounds);
     });
+    _addLegend(map, scale, opacity, noDataLabel);
   }
 
   function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, resourceLabelField, data) {
@@ -92,30 +56,7 @@ this.ckan.views.choroplethmap = (function () {
     return mapping;
   }
 
-  function _addBaseLayer(map) {
-    var attribution = 'Map data &copy; OpenStreetMap contributors, Tiles ' +
-                      'Courtesy of <a href="http://www.mapquest.com/"' +
-                      'target="_blank">MapQuest</a> <img' +
-                      'src="//developer.mapquest.com/content/osm/mq_logo.png">';
-
-    return L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-      subdomains: '1234',
-      attribution: attribution
-    }).addTo(map);
-  }
-
-  function _addGeoJSONLayer(map, geojson, geojsonKeyField, opacity, noDataLabel, featuresValues, router) {
-      var scale = _createScale(geojson, featuresValues);
-
-      _addLegend(map, scale, opacity, noDataLabel);
-
-      return L.geoJson(geojson, {
-        style: _style(scale, opacity, geojsonKeyField, featuresValues),
-        onEachFeature: _onEachFeature(geojsonKeyField, featuresValues, router, noDataLabel)
-      }).addTo(map);
-  }
-
-  function _createScale(geojson, featuresValues) {
+  function _createScale(featuresValues) {
     var values = $.map(featuresValues, function (feature, key) {
           return feature.value;
         }).sort(function (a, b) { return a - b; }),
@@ -159,172 +100,26 @@ this.ckan.views.choroplethmap = (function () {
     legend.addTo(map);
   }
 
-  function _style(scale, opacity, geojsonKeyField, featuresValues) {
-    return function (geojsonFeature) {
-      var feature = featuresValues[geojsonFeature.properties[geojsonKeyField]],
-          color = (feature && feature.value) ? scale(feature.value) : noDataColor;
-
-      return $.extend({ fillColor: color }, defaultStyle);
-    };
-  }
-
-  function _onEachFeature(geojsonKeyField, featuresValues, router, noDataLabel) {
-    var eventsCallbacks = {
-      mouseover: _highlightFeature,
-      mouseout: _resetHighlight
-    };
-
-    if (router) {
-      eventsCallbacks.click = router.toggleActive;
-    }
-
+  function _onEachFeature(geojsonKeyField, featuresValues, noDataLabel, scale) {
     return function (feature, layer) {
-      var elementData = featuresValues[feature.properties[geojsonKeyField]];
+      var elementData = featuresValues[feature.properties[geojsonKeyField]],
+          value = elementData && elementData.value,
+          label = elementData && elementData.label,
+          color = (value) ? scale(value) : noDataColor;
 
-      if (router && elementData) {
-        router.activateIfNeeded(layer);
+      layer.setStyle($.extend({ fillColor: color }, defaultStyle));
+
+      if (label) {
+        var layerLabel = elementData.label + ': ' + (value || noDataLabel);
+        layer.bindLabel(layerLabel);
       } else {
-        layer.setStyle({ className: 'non-clickable' });
-      }
-
-      if (elementData && elementData.label) {
-        var value = (elementData.value) ? elementData.value : noDataLabel,
-            label = elementData.label + ': ' + value;
-
-        layer.bindLabel(label);
-        layer.on(eventsCallbacks);
+        layer.bindLabel(noDataLabel);
       }
     };
   }
 
   function _formatNumber(num) {
     return (num % 1 ? num.toFixed(2) : num);
-  }
-
-  function _highlightFeature(e) {
-    var layer = e.target;
-
-    layer.setStyle(highlightStyle);
-
-    if (!L.Browser.ie && !L.Browser.opera) {
-      layer.bringToFront();
-    }
-  }
-
-  function _resetHighlight(e) {
-    e.target.setStyle(nonHighlightedStyle);
-  }
-
-  function _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues) {
-    var activeFeatures = _getActiveFeatures(resourceKeyField, featuresValues),
-        filterFieldsWithResourceKeyField = filterFields.slice();
-
-    filterFieldsWithResourceKeyField.push(resourceKeyField);
-
-    function _getActiveFeatures(filterName, features) {
-      var filters = _getFilters(),
-          activeFeaturesKeys = filters[filterName] || [],
-          result = [];
-
-      $.each(activeFeaturesKeys, function (i, key) {
-        result.push(features[key]);
-      });
-
-      return result;
-    }
-
-    function toggleActive(e) {
-      var layer = e.target,
-          id = layer.feature.properties[geojsonKeyField],
-          filters = _getFilters(),
-          feature = featuresValues[id],
-          index = $.inArray(feature, activeFeatures);
-
-      // Toggle this feature
-      if (index !== -1) {
-        activeFeatures.splice(index, 1);
-        layer.setStyle(defaultStyle);
-      } else {
-        activeFeatures.push(feature);
-        layer.setStyle(activeStyle);
-      }
-
-      // Update filters
-      filters[resourceKeyField] = $.map(activeFeatures, function (feature) {
-        return $.map(filterFieldsWithResourceKeyField, function (field) {
-          return feature.data[field];
-        });
-      });
-
-      _redirectTo(redirectToUrl, _updateFilters(filters));
-    }
-
-    function activateIfNeeded(layer) {
-      var id = layer.feature.properties[geojsonKeyField],
-          feature = featuresValues[id],
-          filters = _getFilters();
-
-      if ($.inArray(feature, activeFeatures) !== -1) {
-        layer.setStyle(activeStyle);
-      }
-    }
-
-    function _getFilters() {
-      var routeParams = window.location.search.queryStringToJSON(),
-          filters = _parseRouteFilters(routeParams);
-
-      return filters;
-    }
-
-    function _redirectTo(url, filters) {
-      var originalParams = url.queryStringToJSON(),
-          params = $.extend({}, filters, originalParams),
-          aElement = document.createElement('a');
-
-      aElement.href = url;
-      aElement.search = $.param(params);
-
-      window.location.href = aElement.href;
-    }
-
-    function _updateFilters(filters) {
-      var routeParams = window.location.search.queryStringToJSON();
-
-      routeParams.filters = $.map(filters, function (fields, filter) {
-        var fieldsStr = $.map(fields, function (field) {
-          return filter + ':' + field;
-        });
-
-        return fieldsStr.join('|');
-      }).join('|');
-
-      return routeParams;
-    }
-
-    function _parseRouteFilters(routeParams) {
-      // The filters are in format "field:value|field:value|field:value"
-      if (!routeParams || !routeParams.filters) {
-        return {};
-      }
-      var filters = {},
-          fieldValuesStr = routeParams.filters.split("|");
-
-      $.each(fieldValuesStr, function (i, fieldValueStr) {
-        var fieldValue = fieldValueStr.split(":"),
-            field = fieldValue[0],
-            value = fieldValue[1];
-
-        filters[field] = filters[field] || [];
-        filters[field].push(value);
-      });
-
-      return filters;
-    }
-
-    return {
-      toggleActive: toggleActive,
-      activateIfNeeded: activateIfNeeded
-    };
   }
 
   return initialize;
@@ -337,10 +132,21 @@ ckan.module('choroplethmap', function ($, _) {
     var self = this,
         el = self.el,
         options = self.options,
-        noDataLabel = self.i18n('noData');
+        geojsonUrl = options.geojsonUrl,
+        noDataLabel = self.i18n('noData'),
+        resource = {
+          id: options.resourceId,
+          endpoint: options.endpoint || self.sandbox.client.endpoint + '/api'
+        };
 
-    options.endpoint = options.endpoint || self.sandbox.client.endpoint + '/api';
-    ckan.views.choroplethmap(el, options, noDataLabel);
+    options.endpoint = resource.endpoint;
+
+    $.when(
+      $.getJSON(geojsonUrl),
+      recline.Backend.Ckan.query({ size: 1000 }, resource)
+    ).done(function (geojson, query) {
+      ckan.views.choroplethmap(el, options, noDataLabel, geojson, query);
+    });
   }
 
   return {
