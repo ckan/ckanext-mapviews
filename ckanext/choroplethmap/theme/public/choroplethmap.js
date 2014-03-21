@@ -15,9 +15,8 @@ this.ckan.views.choroplethmap = (function () {
 
   function initialize(element, options, noDataLabel, geojson, featuresValues) {
     var map = ckan.views.navigablemap(element, options, noDataLabel, geojson, featuresValues),
-        cleanedFeaturesValues = _removeFeaturesNotInGeoJSON(featuresValues, geojson, options.geojsonKeyField),
-        scale = _createScale(cleanedFeaturesValues, geojson),
-        onEachFeature = _onEachFeature(options.geojsonKeyField, cleanedFeaturesValues, noDataLabel, scale);
+        scale = _createScale(featuresValues, geojson),
+        onEachFeature = _onEachFeature(options.geojsonKeyField, featuresValues, noDataLabel, scale);
 
     _addLegend(map, scale, opacity, noDataLabel);
 
@@ -26,19 +25,6 @@ this.ckan.views.choroplethmap = (function () {
         onEachFeature(layer.feature, layer);
       }
     });
-  }
-
-  function _removeFeaturesNotInGeoJSON(featuresValues, geojson, geojsonKeyField) {
-    var result = {};
-
-    $.each(geojson.features, function (i, feature) {
-      var geojsonKey = feature.properties[geojsonKeyField];
-      if (featuresValues[geojsonKey]) {
-        result[geojsonKey] = featuresValues[geojsonKey];
-      }
-    });
-
-    return result;
   }
 
   function _createScale(featuresValues, geojson) {

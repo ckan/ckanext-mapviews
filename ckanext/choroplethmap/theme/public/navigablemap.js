@@ -131,7 +131,9 @@ this.ckan.views.navigablemap = (function () {
           result = [];
 
       $.each(activeFeaturesKeys, function (i, key) {
-        result.push(features[key]);
+        if (features[key]) {
+          result.push(features[key]);
+        }
       });
 
       return result;
@@ -160,6 +162,8 @@ this.ckan.views.navigablemap = (function () {
         });
       });
 
+      filters[resourceKeyField] = _array_unique(filters[resourceKeyField]);
+
       _redirectTo(redirectToUrl, _updateFilters(filters));
     }
 
@@ -178,6 +182,19 @@ this.ckan.views.navigablemap = (function () {
           filters = _parseRouteFilters(routeParams);
 
       return filters;
+    }
+
+    function _array_unique(array) {
+      var result = [],
+          i;
+
+      for (i = 0; i < array.length; i++) {
+        if (result.indexOf(array[i]) === -1) {
+          result.push(array[i]);
+        }
+      }
+
+      return result;
     }
 
     function _redirectTo(url, filters) {

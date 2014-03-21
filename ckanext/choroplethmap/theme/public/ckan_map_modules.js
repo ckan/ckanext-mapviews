@@ -20,6 +20,8 @@
           var featuresValues = _mapResourceKeyFieldToValues(options.resourceKeyField,
                                                             options.resourceValueField,
                                                             options.resourceLabelField,
+                                                            options.geojsonKeyField,
+                                                            geojson[0],
                                                             query.hits);
 
           ckan.views[mapType](el, options, noDataLabel, geojson[0], featuresValues);
@@ -37,14 +39,18 @@
     };
   }
 
-  function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, resourceLabelField, data) {
-    var mapping = {};
+  function _mapResourceKeyFieldToValues(resourceKeyField, resourceValueField, resourceLabelField, geojsonKeyField, geojson, data) {
+    var mapping = {},
+        geojsonKeys = _getGeojsonKeys(geojsonKeyField, geojson);
 
     $.each(data, function (i, d) {
       var key = d[resourceKeyField],
           label = d[resourceLabelField],
           value = d[resourceValueField];
 
+      if (geojsonKeys.indexOf(key) === -1) {
+        return;
+      }
       mapping[key] = {
         key: key,
         label: label,
@@ -57,6 +63,19 @@
     });
 
     return mapping;
+  }
+
+  function _getGeojsonKeys(geojsonKeyField, geojson) {
+    var result = [],
+        features = geojson.features,
+        i,
+        len = features.length;
+
+    for (i = 0; i < len; i++) {
+      result.push(features[i].properties[geojsonKeyField]);
+    }
+
+    return result;
   }
 
   ckan.module('navigablemap', moduleInitializationFor('navigablemap'));
