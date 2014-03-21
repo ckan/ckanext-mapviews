@@ -7,8 +7,7 @@
   {%- set extra_html = caller() if caller -%}
   {% call form.input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
   <div class="choropleth-map-fields">
-    {% for field in fields %}
-      {{ removableSelect(name, options=options, selected=field, attrs=attrs) }}
+    {% for field in fields %} {{ removableSelect(name, options=options, selected=field, attrs=attrs) }}
     {% endfor %}
     </div>
     <a href="#" class="choropleth-map-addField">{{ _('Add Field') }}</a>
@@ -28,6 +27,7 @@
 
 {% block form %}
 
+{% block form_required_fields %}
 {{
     form.input('geojson_url', label=_('GeoJSON URL'),
         classes=['long'],
@@ -50,6 +50,8 @@
     form.select('resource_label_field', label=_('Label'), options=textual_fields,
         selected=resource_view['resource_label_field'], is_required=true)
 }}
+
+{% endblock %}
 
 {{
     form.input('redirect_to_url', label=_('Redirect to URL'),
