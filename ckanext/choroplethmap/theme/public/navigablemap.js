@@ -178,10 +178,7 @@ this.ckan.views.navigablemap = (function () {
     }
 
     function _getFilters() {
-      var routeParams = window.location.search.queryStringToJSON(),
-          filters = _parseRouteFilters(routeParams);
-
-      return filters;
+      return ckan.views.viewhelpers.filters.get();
     }
 
     function _array_unique(array) {
@@ -220,26 +217,6 @@ this.ckan.views.navigablemap = (function () {
       }).join('|');
 
       return routeParams;
-    }
-
-    function _parseRouteFilters(routeParams) {
-      // The filters are in format "field:value|field:value|field:value"
-      if (!routeParams || !routeParams.filters) {
-        return {};
-      }
-      var filters = {},
-          fieldValuesStr = routeParams.filters.split("|");
-
-      $.each(fieldValuesStr, function (i, fieldValueStr) {
-        var fieldValue = fieldValueStr.split(":"),
-            field = fieldValue[0],
-            value = fieldValue[1];
-
-        filters[field] = filters[field] || [];
-        filters[field].push(value);
-      });
-
-      return filters;
     }
 
     return {
