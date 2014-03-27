@@ -169,8 +169,7 @@ this.ckan.views.navigablemap = (function () {
 
     function activateIfNeeded(layer) {
       var id = layer.feature.properties[geojsonKeyField],
-          feature = featuresValues[id],
-          filters = _getFilters();
+          feature = featuresValues[id];
 
       if ($.inArray(feature, activeFeatures) !== -1) {
         layer.setStyle(activeStyle);
