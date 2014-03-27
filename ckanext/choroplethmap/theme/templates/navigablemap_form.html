@@ -63,7 +63,7 @@
 {% set templateFieldInputs = removableSelect('filter_fields', options=fields) %}
 
 <div
-  data-module = "basiccharts_filters_form"
+  data-module = "filters_form"
   data-module-template-filter-inputs = "{{ h.remove_linebreaks(templateFieldInputs) }}"
   data-module-filters-selector = ".choropleth-map-fields"
   data-module-add-filter-selector = ".choropleth-map-addField"
