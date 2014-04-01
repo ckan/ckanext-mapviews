@@ -126,7 +126,7 @@ this.ckan.views.navigablemap = (function () {
     filterFieldsWithResourceKeyField.push(resourceKeyField);
 
     function _getActiveFeatures(filterName, features) {
-      var filters = _getFilters(),
+      var filters = ckan.views.viewhelpers.filters.get(),
           activeFeaturesKeys = filters[filterName] || [],
           result = [];
 
@@ -142,7 +142,6 @@ this.ckan.views.navigablemap = (function () {
     function toggleActive(e) {
       var layer = e.target,
           id = layer.feature.properties[geojsonKeyField],
-          filters = _getFilters(),
           feature = featuresValues[id],
           index = $.inArray(feature, activeFeatures);
 
@@ -156,15 +155,15 @@ this.ckan.views.navigablemap = (function () {
       }
 
       // Update filters
-      filters[resourceKeyField] = $.map(activeFeatures, function (feature) {
+      var updatedFilters = _array_unique($.map(activeFeatures, function (feature) {
         return $.map(filterFieldsWithResourceKeyField, function (field) {
           return feature.data[field];
         });
-      });
+      }));
 
-      filters[resourceKeyField] = _array_unique(filters[resourceKeyField]);
-
-      _redirectTo(redirectToUrl, _updateFilters(filters));
+      ckan.views.viewhelpers.filters.setAndRedirectTo(resourceKeyField,
+                                                      updatedFilters,
+                                                      redirectToUrl);
     }
 
     function activateIfNeeded(layer) {
@@ -174,10 +173,6 @@ this.ckan.views.navigablemap = (function () {
       if ($.inArray(feature, activeFeatures) !== -1) {
         layer.setStyle(activeStyle);
       }
-    }
-
-    function _getFilters() {
-      return ckan.views.viewhelpers.filters.get();
     }
 
     function _array_unique(array) {
@@ -191,31 +186,6 @@ this.ckan.views.navigablemap = (function () {
       }
 
       return result;
-    }
-
-    function _redirectTo(url, filters) {
-      var originalParams = url.queryStringToJSON(),
-          params = $.extend({}, filters, originalParams),
-          aElement = document.createElement('a');
-
-      aElement.href = url;
-      aElement.search = $.param(params);
-
-      window.location.href = aElement.href;
-    }
-
-    function _updateFilters(filters) {
-      var routeParams = window.location.search.queryStringToJSON();
-
-      routeParams.filters = $.map(filters, function (fields, filter) {
-        var fieldsStr = $.map(fields, function (field) {
-          return filter + ':' + field;
-        });
-
-        return fieldsStr.join('|');
-      }).join('|');
-
-      return routeParams;
     }
 
     return {
