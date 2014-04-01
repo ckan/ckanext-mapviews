@@ -2,3 +2,22 @@
   height: 500px;
   cursor: default;
 }
+
+.dashboard-grid .navigablemap {
+  width: 100%;
+  height: 100%;
+}
+
+.navigablemap .non-clickable {
+  cursor: default;
+}
+
+.navigablemap .info {
+  line-height: 18px;
+  background-color: white;
+  padding: 0.5em;
+}
+
+.long input {
+  width: 100%;
+}
