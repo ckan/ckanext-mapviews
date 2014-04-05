@@ -30,10 +30,9 @@
 
 {% block form_required_fields %}
 {{
-    form.input('geojson_url', label=_('GeoJSON URL'),
-        classes=['long'],
+    form.select('geojson_url', label=_('GeoJSON Resource'), options=geojson_resources,
         error=errors.geojson_url,
-        value=resource_view['geojson_url'], is_required=true)
+        selected=resource_view['geojson_url'], is_required=true)
 }}
 
 {{

@@ -184,6 +184,29 @@ class TestNavigableMap(object):
         assert resource_view['filter_fields'] == ['value']
 
     @mock.patch('ckan.plugins.toolkit.get_action')
+    def test_setup_template_variables_adds_geojson_resources(self, get_action):
+        fields = [
+            {
+                'name': 'Map',
+                'url': 'http://demo.ckan.org/map.json',
+            }
+        ]
+        expected_fields = [{
+            'text': 'Map',
+            'value': 'http://demo.ckan.org/map.json'
+        }]
+
+        get_action.return_value.return_value = {
+            'count': 1L,
+            'results': fields
+        }
+        template_variables = self._setup_template_variables()
+
+        returned_fields = template_variables.get('geojson_resources')
+        assert returned_fields is not None
+        assert returned_fields == expected_fields
+
+    @mock.patch('ckan.plugins.toolkit.get_action')
     def test_setup_template_variables_adds_fields_without_the_id(self, get_action):
         fields = [
             {'id': '_id', 'type': 'int4'},

@@ -60,6 +60,7 @@ class NavigableMap(p.SingletonPlugin):
         resource_view = data_dict['resource_view']
         filter_fields = aslist(resource_view.get('filter_fields', []))
         resource_view['filter_fields'] = filter_fields
+        geojson_resources = _get_geojson_resources()
         fields = _get_fields(resource)
         fields_without_id = _remove_id_and_prepare_to_template(fields)
         numeric_fields = _filter_numeric_fields_without_id(fields)
@@ -67,6 +68,7 @@ class NavigableMap(p.SingletonPlugin):
 
         return {'resource': resource,
                 'resource_view': resource_view,
+                'geojson_resources': geojson_resources,
                 'fields': fields_without_id,
                 'numeric_fields': numeric_fields,
                 'textual_fields': textual_fields}
@@ -96,13 +98,22 @@ class ChoroplethMap(NavigableMap):
         return 'choroplethmap_form.html'
 
 
+def _get_geojson_resources():
+    data = {
+        'query': 'format:geojson',
+    }
+    result = p.toolkit.get_action('resource_search')({}, data)
+    return [{'text': r['name'], 'value': r['url']}
+            for r in result.get('results', [])]
+
+
 def _get_fields(resource):
     data = {
         'resource_id': resource['id'],
         'limit': 0
     }
     result = p.toolkit.get_action('datastore_search')({}, data)
-    return result['fields']
+    return result.get('fields', [])
 
 
 def _remove_id_and_prepare_to_template(fields):
