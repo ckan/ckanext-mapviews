@@ -33,12 +33,14 @@ class TestNavigableMap(object):
 
     @classmethod
     def setup_class(cls):
+        p.load('viewhelpers')
         p.load('navigablemap')
         cls.plugin = p.get_plugin('navigablemap')
 
     @classmethod
     def teardown_class(cls):
         p.unload('navigablemap')
+        p.unload('viewhelpers')
 
     def test_plugin_templates_path_is_added_to_config(self):
         filename = inspect.getfile(inspect.currentframe())
@@ -283,12 +285,14 @@ class TestChoroplethMap(object):
 
     @classmethod
     def setup_class(cls):
+        p.load('viewhelpers')
         p.load('choroplethmap')
         cls.plugin = p.get_plugin('choroplethmap')
 
     @classmethod
     def teardown_class(cls):
         p.unload('choroplethmap')
+        p.unload('viewhelpers')
 
     def test_view_template_is_correct(self):
         view_template = self.plugin.view_template({}, {})
