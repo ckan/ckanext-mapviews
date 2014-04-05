@@ -17,3 +17,8 @@
   background-color: white;
   padding: 0.5em;
 }
+
+.choropleth-map-removeField {
+  cursor: pointer;
+  color: #bd362f;
+}
