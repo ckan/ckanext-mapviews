@@ -106,15 +106,15 @@ Now, we just need to select what value we want to plot (let's use the latest
 year, in the ```2012``` column), and what label to use (```Country Name```).
 You can leave the remaining fields blank. In the end, we'll have:
 
-| Attribute         | Value                          |
-| ----------------- | ------------------------------ |
-| GeoJSON Resource  | (Your GeoJSON Resource's name) |
-| GeoJSON Key Field | wb_a3                          |
-| Key               | Country Code                   |
-| Value             | 2012                           |
-| Label             | Country Name                   |
-| Redirect to URL   |                                |
-| Fields            |                                |
+| Attribute         | Value                            |
+| ----------------- | -------------------------------- |
+| GeoJSON Resource  | _(Your GeoJSON Resource's name)_ |
+| GeoJSON Key Field | wb_a3                            |
+| Key               | Country Code                     |
+| Value             | 2012                             |
+| Label             | Country Name                     |
+| Redirect to URL   |                                  |
+| Fields            |                                  |
 
 Click on ```Preview``` and you should see a map like:
 
