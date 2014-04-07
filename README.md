@@ -94,30 +94,27 @@ and upload two resources: the GeoJSON and the data file.
 
 Go to the data file's manage resource page and create a new ```Choropleth
 Map``` view. You'll see a form with a few fields. Use "Internet usage across
-the globe" as a title, leave the description empty (if you want). Then, we need
-to add the GeoJSON. We need two things: its URL and the key field. To get the
-URL, go to its resource page (that you just created), copy the download
-link (it should look like
-http://demo.ckan.org/dataset/f07ffd99-739b-465f-93e9-bfx2576b1b5d/resource/e24c50f4-48e7-4bc4-9e12-54f3141bcf5b/download/countries.geojson),
-and paste in that field.
+the globe" as a title, leave the description empty (if you want). Now we need
+to add the GeoJSON.
 
-The ```GeoJSON Key Field``` should be ```wb_a3```, as we found out before.
-We'll link that field to the ```Country Code``` column in our data, so set it
+Select in the ```GeoJSON Resource``` field the resource you just created.  The
+```GeoJSON Key Field``` should be ```wb_a3```, as we found out before.  We'll
+link that field to the ```Country Code``` column in our data, so set it
 in the ```Key``` field.
 
 Now, we just need to select what value we want to plot (let's use the latest
 year, in the ```2012``` column), and what label to use (```Country Name```).
 You can leave the remaining fields blank. In the end, we'll have:
 
-| Attribute         | Value                                                                                                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| GeoJSON URL       | http://demo.ckan.org/dataset/f07ffd99-739b-465f-93e9-bfx2576b1b5d/resource/e24c50f4-48e7-4bc4-9e12-54f3141bcf5b/download/countries.geojson |
-| GeoJSON Key Field | wb_a3                                                                                                                                      |
-| Key               | Country Code                                                                                                                               |
-| Value             | 2012                                                                                                                                       |
-| Label             | Country Name                                                                                                                               |
-| Redirect to URL   |                                                                                                                                            |
-| Fields            |                                                                                                                                            |
+| Attribute         | Value                          |
+| ----------------- | ------------------------------ |
+| GeoJSON Resource  | (Your GeoJSON Resource's name) |
+| GeoJSON Key Field | wb_a3                          |
+| Key               | Country Code                   |
+| Value             | 2012                           |
+| Label             | Country Name                   |
+| Redirect to URL   |                                |
+| Fields            |                                |
 
 Click on ```Preview``` and you should see a map like:
 
