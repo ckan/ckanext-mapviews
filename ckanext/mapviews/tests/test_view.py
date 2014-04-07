@@ -5,10 +5,10 @@ import nose.tools
 import pylons.config as config
 
 import ckan.plugins as p
-import ckanext.choroplethmap.plugin as cm
+import ckanext.mapviews.plugin as plugin
 
 
-url_is_relative_or_in_same_domain = cm.url_is_relative_or_in_same_domain
+url_is_relative_or_in_same_domain = plugin.url_is_relative_or_in_same_domain
 Invalid = p.toolkit.Invalid
 
 

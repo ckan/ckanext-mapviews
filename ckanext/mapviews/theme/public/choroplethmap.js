@@ -1,7 +1,8 @@
 this.ckan = this.ckan || {};
 this.ckan.views = this.ckan.views || {};
+this.ckan.views.mapviews = this.ckan.views.mapviews || {};
 
-this.ckan.views.choroplethmap = (function () {
+this.ckan.views.mapviews.choroplethmap = (function () {
   'use strict';
 
   var noDataColor = '#F7FBFF',
@@ -14,7 +15,7 @@ this.ckan.views.choroplethmap = (function () {
       };
 
   function initialize(element, options, noDataLabel, geojson, featuresValues) {
-    var map = ckan.views.navigablemap(element, options, noDataLabel, geojson, featuresValues),
+    var map = ckan.views.mapviews.navigablemap(element, options, noDataLabel, geojson, featuresValues),
         scale = _createScale(featuresValues, geojson),
         onEachFeature = _onEachFeature(options.geojsonKeyField, featuresValues, noDataLabel, scale);
 

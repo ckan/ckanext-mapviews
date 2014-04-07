@@ -4,7 +4,7 @@ import sys, os
 version = '0.1'
 
 setup(
-	name='ckanext-choroplethmap',
+	name='ckanext-mapviews',
 	version=version,
 	description="Choropleth Map view for CKAN",
 	long_description="""\
@@ -13,10 +13,10 @@ setup(
 	keywords='',
 	author='Vitor Baptista',
 	author_email='vitor.baptista@okfn.org',
-	url='https://github.com/ckan/ckanext-choroplethmap',
+	url='https://github.com/ckan/ckanext-mapviews',
 	license='',
 	packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-	namespace_packages=['ckanext', 'ckanext.choroplethmap'],
+	namespace_packages=['ckanext', 'ckanext.mapviews'],
 	include_package_data=True,
 	zip_safe=False,
 	install_requires=[
@@ -25,7 +25,7 @@ setup(
 	entry_points=\
 	"""
     [ckan.plugins]
-	navigablemap=ckanext.choroplethmap.plugin:NavigableMap
-	choroplethmap=ckanext.choroplethmap.plugin:ChoroplethMap
+	navigablemap=ckanext.mapviews.plugin:NavigableMap
+	choroplethmap=ckanext.mapviews.plugin:ChoroplethMap
 	""",
 )

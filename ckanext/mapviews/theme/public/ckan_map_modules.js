@@ -24,7 +24,7 @@
                                                             geojson[0],
                                                             query.hits);
 
-          ckan.views[mapType](el, options, noDataLabel, geojson[0], featuresValues);
+          ckan.views.mapviews[mapType](el, options, noDataLabel, geojson[0], featuresValues);
         });
       }
 

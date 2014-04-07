@@ -32,7 +32,7 @@ class NavigableMap(p.SingletonPlugin):
 
     def update_config(self, config):
         p.toolkit.add_template_directory(config, 'theme/templates')
-        p.toolkit.add_resource('theme/public', 'choroplethmap')
+        p.toolkit.add_resource('theme/public', 'mapviews')
 
     def info(self):
         schema = {

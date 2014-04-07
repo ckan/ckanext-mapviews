@@ -1,7 +1,8 @@
 this.ckan = this.ckan || {};
 this.ckan.views = this.ckan.views || {};
+this.ckan.views.mapviews = this.ckan.views.mapviews || {};
 
-this.ckan.views.navigablemap = (function () {
+this.ckan.views.mapviews.navigablemap = (function () {
   'use strict';
 
   var borderColor = '#031127',
