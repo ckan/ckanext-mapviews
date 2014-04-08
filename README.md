@@ -13,11 +13,11 @@ Installation
 ------------
 
 To use it, simply clone this repository and run ```python setup.py install```.
-Then add ```mapviews``` to the list in ```ckan.plugins``` in your CKAN
+Then add ```navigablemap``` and/or ```choroplethmap``` to the list in ```ckan.plugins``` in your CKAN
 config file.
 
-Restart your webserver. You should see the new "Choropleth Map" chart type as
-an option in the view type's list on any resource that's in the DataStore.
+Restart your webserver. You should see the new "Navigable Map" and/or "Choropleth Map" chart types (depending on which plugins you added to the list) as
+options in the view type's list on any resource that's in the DataStore.
 
 Usage
 -----
