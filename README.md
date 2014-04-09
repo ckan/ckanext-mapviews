@@ -131,6 +131,28 @@ ahead and see how the maps look like in other years. We can't compare the maps
 directly, as the scales change depending on the data, but the difference from
 2000 to 2012 is still impressive.
 
+### Filters
+
+If the map is shown in places other than its original URL in the resource
+view's list (for example, inside a
+[ckanext-dashboard](//github.com/ckan/ckanext-dashboard) or
+[ckanext-page](//github.com/ckan/ckanext-pages)), its regions become clickable.
+
+When the user clicks on a region, we'll add a filter to the current page using
+the `Key` attribute. Using the previous example, if I clicked on Brazil, it'll
+add the filters `Country Code:BRA` to the current page.
+
+The user can deactivate the filters by clicking on the same region again, and
+can activate multiple filters.
+
+If you'd like to, when clicking on a region, redirect the user to another page
+with that filter set (for example, another resource view or a dashboard),
+you can add the target URL to the `Redirect to URL` field. If that's left
+blank, it'll simply add filters to the current page.
+
+To learn more about it, check the
+[ckanext-viewhelpers](//github.com/ckan/ckanext-viewhelpers) page.
+
 License
 -------
 
