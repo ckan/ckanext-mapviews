@@ -15,7 +15,7 @@ setup(
 	author_email='vitor.baptista@okfn.org',
 	url='https://github.com/ckan/ckanext-mapviews',
 	license='',
-	packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
+	packages=find_packages(exclude=['*.tests']),
 	namespace_packages=['ckanext', 'ckanext.mapviews'],
 	include_package_data=True,
 	zip_safe=False,
