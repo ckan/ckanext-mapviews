@@ -19,7 +19,7 @@ install that first.
 After that, simply clone this repository and run ```python setup.py install```.
 Then add ```navigablemap``` and/or ```choroplethmap``` to the list in
 ```ckan.plugins``` in your CKAN config file. Make sure to put them after
-```viewhelpers```.
+`viewhelpers`.
 
 Restart your webserver. You should see the new "Navigable Map" and/or
 "Choropleth Map" chart types (depending on which plugins you added to the list)
