@@ -47,8 +47,6 @@ class NavigableMap(p.SingletonPlugin):
         return {'name': 'navigable-map',
                 'title': 'Navigable Map',
                 'icon': 'map-marker',
-                'sizex': 6,
-                'sizey': 4,
                 'schema': schema,
                 'iframed': False}
 
