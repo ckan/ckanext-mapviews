@@ -127,7 +127,7 @@ this.ckan.views.mapviews.navigablemap = (function () {
     filterFieldsWithResourceKeyField.push(resourceKeyField);
 
     function _getActiveFeatures(filterName, features) {
-      var filters = ckan.views.viewhelpers.filters.get(),
+      var filters = ckan.views.filters.get(),
           activeFeaturesKeys = filters[filterName] || [],
           result = [];
 
@@ -162,9 +162,9 @@ this.ckan.views.mapviews.navigablemap = (function () {
         });
       }));
 
-      ckan.views.viewhelpers.filters.setAndRedirectTo(resourceKeyField,
-                                                      updatedFilters,
-                                                      redirectToUrl);
+      ckan.views.filters.setAndRedirectTo(resourceKeyField,
+                                          updatedFilters,
+                                          redirectToUrl);
     }
 
     function activateIfNeeded(layer) {
