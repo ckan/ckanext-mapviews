@@ -4,7 +4,7 @@ ckanext-mapviews
 ![Pakistan choropleth map](doc/img/pakistan.png)
 
 This extension adds regular and choropleth maps to CKAN, using the new Resource
-View being developed in https://github.com/ckan/ckan/tree/1251-resource-view.
+View being developed on CKAN's master branch (currently unreleased).
 
 It uses [LeafletJS](http://leafletjs.com), which is compatible with all major
 browsers (including IE7+).
