@@ -48,7 +48,9 @@ class NavigableMap(p.SingletonPlugin):
                 'title': 'Navigable Map',
                 'icon': 'map-marker',
                 'schema': schema,
-                'iframed': False}
+                'iframed': False,
+                'filterable': True,
+                }
 
     def can_view(self, data_dict):
         return data_dict['resource'].get('datastore_active', False)
@@ -86,6 +88,7 @@ class ChoroplethMap(NavigableMap):
         info['name'] = 'choropleth-map'
         info['title'] = 'Choropleth Map'
         info['schema']['resource_value_field'] = [not_empty]
+        info['filterable'] = True
 
         return info
 
