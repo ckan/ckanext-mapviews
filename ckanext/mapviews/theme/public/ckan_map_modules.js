@@ -8,14 +8,31 @@
             el = self.el,
             options = self.options,
             noDataLabel = self.i18n('noData'),
+            filterFields = self.options.filterFields,
             resource = {
               id: options.resourceId,
               endpoint: options.endpoint || self.sandbox.client.endpoint + '/api'
             };
 
+        var filters = [];
+        for (var filter in filterFields){
+          if (filterFields.hasOwnProperty(filter)) {
+            filters.push({
+              "type": "term",
+              "field": filter,
+              "term": filterFields[filter]
+            });
+          }
+        };
+
+        var query = {
+          size: 1000,
+          filters: filters
+        };
+
         $.when(
           $.getJSON(options.geojsonUrl),
-          recline.Backend.Ckan.query({ size: 1000 }, resource)
+          recline.Backend.Ckan.query(query, resource)
         ).done(function (geojson, query) {
           var featuresValues = _mapResourceKeyFieldToValues(options.resourceKeyField,
                                                             options.resourceValueField,

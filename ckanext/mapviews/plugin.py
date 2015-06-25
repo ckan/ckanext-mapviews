@@ -41,7 +41,7 @@ class NavigableMap(p.SingletonPlugin):
             'resource_key_field': [not_empty],
             'resource_label_field': [not_empty],
             'redirect_to_url': [ignore_missing],
-            'filter_fields': [ignore_missing],
+            #'filter_fields': [ignore_missing],
         }
 
         return {'name': 'navigable-map',
@@ -58,8 +58,8 @@ class NavigableMap(p.SingletonPlugin):
     def setup_template_variables(self, context, data_dict):
         resource = data_dict['resource']
         resource_view = data_dict['resource_view']
-        filter_fields = aslist(resource_view.get('filter_fields', []))
-        resource_view['filter_fields'] = filter_fields
+        #filter_fields = aslist(resource_view.get('filter_fields', []))
+        #resource_view['filter_fields'] = filter_fields
         geojson_resources = _get_geojson_resources()
         fields = _get_fields(resource)
         fields_without_id = _remove_id_and_prepare_to_template(fields)
