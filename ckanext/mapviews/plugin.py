@@ -3,6 +3,9 @@ import urlparse
 import ckan.plugins as p
 import pylons.config as config
 
+
+from ckanext.mapviews import helpers as mapviews_helpers
+
 Invalid = p.toolkit.Invalid
 _ = p.toolkit._
 not_empty = p.toolkit.get_validator('not_empty')
@@ -29,6 +32,7 @@ class NavigableMap(p.SingletonPlugin):
 
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IResourceView, inherit=True)
+    p.implements(p.ITemplateHelpers, inherit=True)
 
     def update_config(self, config):
         p.toolkit.add_template_directory(config, 'theme/templates')
@@ -78,6 +82,11 @@ class NavigableMap(p.SingletonPlugin):
 
     def form_template(self, context, data_dict):
         return 'navigablemap_form.html'
+
+    def get_helpers(self):
+        return {
+                'mapviews_get_common_map_config' : mapviews_helpers.mapviews_get_common_map_config
+                }
 
 
 class ChoroplethMap(NavigableMap):

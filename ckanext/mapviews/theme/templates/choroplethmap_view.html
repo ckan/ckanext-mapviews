@@ -1,5 +1,7 @@
 {% resource "mapviews/main" %}
 
+
+{% set map_config = h.mapviews_get_common_map_config() %}
 <div
   data-module = "choroplethmap"
   data-module-resource-id = "{{ resource.id }}"
@@ -8,6 +10,7 @@
   data-module-resource-label-field = "{{ resource_view.resource_label_field }}"
   data-module-geojson-url = "{{ resource_view.geojson_url }}"
   data-module-geojson-key-field = "{{ resource_view.geojson_key_field }}"
+  data-module-map-config = "{{ h.dump_json(map_config) }}"
   data-module-redirect-to-url = "{{ resource_view.redirect_to_url }}"
   data-module-filter-fields = "{{ h.dump_json(resource_view.filters) if resource_view.filters else '' }}"
   id = "choroplethmap-{{ resource_view.id }}"
