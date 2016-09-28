@@ -13,7 +13,6 @@
               id: options.resourceId,
               endpoint: options.endpoint || self.sandbox.client.endpoint + '/api'
             };
-            console.log(options.mapConfig);
 
         var filters = [];
         for (var filter in filterFields){
