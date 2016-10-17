@@ -1,7 +1,9 @@
 import urlparse
+import json
 
 import ckan.plugins as p
 import pylons.config as config
+
 
 Invalid = p.toolkit.Invalid
 _ = p.toolkit._
@@ -65,13 +67,16 @@ class NavigableMap(p.SingletonPlugin):
         fields_without_id = _remove_id_and_prepare_to_template(fields)
         numeric_fields = _filter_numeric_fields_without_id(fields)
         textual_fields = _filter_textual_fields_without_id(fields)
+        map_config = _get_map_configuration()
 
         return {'resource': resource,
                 'resource_view': resource_view,
                 'geojson_resources': geojson_resources,
                 'fields': fields_without_id,
                 'numeric_fields': numeric_fields,
-                'textual_fields': textual_fields}
+                'textual_fields': textual_fields,
+                'map_config': map_config
+                }
 
     def view_template(self, context, data_dict):
         return 'navigablemap_view.html'
@@ -97,6 +102,13 @@ class ChoroplethMap(NavigableMap):
 
     def form_template(self, context, data_dict):
         return 'choroplethmap_form.html'
+
+def _get_map_configuration():
+
+    namespace = 'ckanext.spatial.common_map.'
+    map_config = dict([(k.replace(namespace, ''), v) for k, v in config.iteritems() if k.startswith(namespace)])
+
+    return map_config
 
 
 def _get_geojson_resources():

@@ -29,6 +29,7 @@ this.ckan.views.mapviews.navigablemap = (function () {
         geojsonUrl = options.geojsonUrl,
         geojsonKeyField = options.geojsonKeyField,
         resourceKeyField = options.resourceKeyField,
+        mapBaseLayerConfig = options.mapConfig,
         redirectToUrl = (options.redirectToUrl === true) ? '' : options.redirectToUrl,
         filterFields = options.filterFields,
         map = L.map(elementId),
@@ -37,12 +38,13 @@ this.ckan.views.mapviews.navigablemap = (function () {
         maxBounds,
         router;
 
+
     var isInOwnResourceViewPage = $(element.parent()).hasClass('ckanext-datapreview');
     if (!isInOwnResourceViewPage) {
       router = _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues);
     }
 
-    _addBaseLayer(map);
+    _addBaseLayer(map, mapBaseLayerConfig);
     geojsonLayer = _addGeoJSONLayer(map, geojson, geojsonKeyField, noDataLabel, featuresValues, router);
     bounds = geojsonLayer.getBounds();
     maxBounds = bounds.pad(0.1);
@@ -53,13 +55,22 @@ this.ckan.views.mapviews.navigablemap = (function () {
     return map;
   }
 
-  function _addBaseLayer(map) {
-    var attribution = 'Map data &copy; OpenStreetMap contributors, Tiles ' +
-                      'Courtesy of <a href="http://www.mapquest.com/"' +
-                      'target="_blank">MapQuest</a> <img' +
-                      'src="//developer.mapquest.com/content/osm/mq_logo.png">';
+  function _addBaseLayer(map, mapBaseLayerConfig) {
+    var baseLayerUrl;
+    var attribution;
 
-    return L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+    if (mapBaseLayerConfig.type == 'custom') {
+          // Custom XYZ layer
+       if (mapBaseLayerConfig['custom.url']) baseLayerUrl = mapBaseLayerConfig['custom.url'];
+       if (mapBaseLayerConfig['attribution']) attribution = mapBaseLayerConfig['attribution'];
+
+    } else {
+          // Default to Stamen base map
+        baseLayerUrl = 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png';
+        attribution =  'Map tiles by <a href="http://stamen.com">Stamen Design</a> (<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>). Data by <a href="http://openstreetmap.org">OpenStreetMap</a> (<a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>)';
+    }
+
+    return L.tileLayer(baseLayerUrl, {
       subdomains: '1234',
       attribution: attribution
     }).addTo(map);
