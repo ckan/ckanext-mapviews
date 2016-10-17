@@ -102,6 +102,7 @@ class ChoroplethMap(NavigableMap):
 def _get_geojson_resources():
     data = {
         'query': 'format:geojson',
+        'order_by': 'name',
     }
     result = p.toolkit.get_action('resource_search')({}, data)
     return [{'text': r['name'], 'value': r['url']}
