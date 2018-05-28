@@ -118,12 +118,12 @@ this.ckan.views.mapviews.navigablemap = (function () {
 
   function _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues) {
     var activeFeatures = _getActiveFeatures(resourceKeyField, featuresValues),
-        filterFieldsWithResourceKeyField = filterFields.slice();
+      filterFieldsWithResourceKeyField = Array.isArray(filterFields) ? filterFields.slice() : [];
 
     filterFieldsWithResourceKeyField.push(resourceKeyField);
 
     function _getActiveFeatures(filterName, features) {
-      var filters = ckan.views.filters.get(),
+      var filters = ckan.views.filters ? ckan.views.filters.get() : {},
           activeFeaturesKeys = filters[filterName] || [],
           result = [];
 
