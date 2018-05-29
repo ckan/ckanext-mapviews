@@ -25,7 +25,7 @@ this.ckan.views.mapviews.navigablemap = (function () {
       };
 
   function initialize(element, options, noDataLabel, geojson, featuresValues) {
-    var elementId = element.context.id,
+    var elementId = element['0'].id,
         geojsonUrl = options.geojsonUrl,
         geojsonKeyField = options.geojsonKeyField,
         resourceKeyField = options.resourceKeyField,
@@ -54,13 +54,9 @@ this.ckan.views.mapviews.navigablemap = (function () {
   }
 
   function _addBaseLayer(map) {
-    var attribution = 'Map data &copy; OpenStreetMap contributors, Tiles ' +
-                      'Courtesy of <a href="http://www.mapquest.com/"' +
-                      'target="_blank">MapQuest</a> <img' +
-                      'src="//developer.mapquest.com/content/osm/mq_logo.png">';
+    var attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-    return L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-      subdomains: '1234',
+    return L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: attribution
     }).addTo(map);
   }
@@ -122,12 +118,12 @@ this.ckan.views.mapviews.navigablemap = (function () {
 
   function _router(resourceKeyField, geojsonKeyField, redirectToUrl, filterFields, featuresValues) {
     var activeFeatures = _getActiveFeatures(resourceKeyField, featuresValues),
-        filterFieldsWithResourceKeyField = filterFields.slice();
+      filterFieldsWithResourceKeyField = Array.isArray(filterFields) ? filterFields.slice() : [];
 
     filterFieldsWithResourceKeyField.push(resourceKeyField);
 
     function _getActiveFeatures(filterName, features) {
-      var filters = ckan.views.filters.get(),
+      var filters = ckan.views.filters ? ckan.views.filters.get() : {},
           activeFeaturesKeys = filters[filterName] || [],
           result = [];
 
