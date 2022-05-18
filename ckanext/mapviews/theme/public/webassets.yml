@@ -1,0 +1,25 @@
+main-css:
+  output: ckanext-mapviews/main.css
+  extra:
+    preload:
+      - base/main
+  contents:
+    - vendor/leaflet.css
+    - vendor/leaflet.label.css
+    - navigablemap.css
+    - choroplethmap.css
+
+main:
+  output: ckanext-mapviews/main.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - vendor/leaflet.js
+    - vendor/leaflet.label.js
+    - vendor/d3.scale.quantize.js
+    - vendor/backend.ckan.js
+    - vendor/queryStringToJSON.js
+    - ckan_map_modules.js
+    - navigablemap.js
+    - choroplethmap.js
