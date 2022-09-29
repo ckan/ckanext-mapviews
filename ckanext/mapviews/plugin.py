@@ -1,7 +1,15 @@
-import urlparse
-
 import ckan.plugins as p
-import pylons.config as config
+
+try:
+    import urlparse
+except:
+    import urllib as urlparse
+
+try:
+    import pylons.config as config
+except:
+    config = p.toolkit.config
+
 
 Invalid = p.toolkit.Invalid
 _ = p.toolkit._
