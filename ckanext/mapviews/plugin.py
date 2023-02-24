@@ -3,7 +3,7 @@ import ckan.plugins as p
 try:
     import urlparse
 except:
-    import urllib as urlparse
+    import urllib.parse as urlparse
 
 try:
     import pylons.config as config
